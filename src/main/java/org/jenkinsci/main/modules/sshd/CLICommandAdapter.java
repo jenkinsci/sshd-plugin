@@ -2,7 +2,6 @@ package org.jenkinsci.main.modules.sshd;
 
 import hudson.Extension;
 import hudson.cli.CLICommand;
-import hudson.model.User;
 import org.apache.sshd.server.Command;
 
 import java.io.PrintStream;
@@ -14,7 +13,7 @@ import java.util.Locale;
  * @author Kohsuke Kawaguchi
  */
 @Extension
-public class BaseCLICommandAdapter extends SshCommandFactory {
+public class CLICommandAdapter extends SshCommandFactory {
     @Override
     public Command create(CommandLine commandLine) {
         String cmd = commandLine.get(0);
