@@ -11,7 +11,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jenkins-module</packaging>
   <name>SSH server</name>
-  <description>Works as an SSH server</description>
+  <description>Adds SSH server functionality to Jenkins, exposing CLI commands through it</description>
 
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-module.git</connection>
