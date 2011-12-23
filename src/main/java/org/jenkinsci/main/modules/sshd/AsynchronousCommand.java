@@ -1,8 +1,11 @@
 package org.jenkinsci.main.modules.sshd;
 
+import hudson.model.User;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
+import org.apache.sshd.server.SessionAware;
+import org.apache.sshd.server.session.ServerSession;
 import org.jenkinsci.main.modules.sshd.SshCommandFactory.CommandLine;
 
 import java.io.IOException;
@@ -16,13 +19,15 @@ import java.util.logging.Logger;
  *
  * @author Kohsuke Kawaguchi
  */
-public abstract class AsynchronousCommand implements Command {
+public abstract class AsynchronousCommand implements Command, SessionAware {
     private InputStream in;
     private OutputStream out;
     private OutputStream err;
     private ExitCallback callback;
     private CommandLine cmdLine;
     private Thread thread;
+    private ServerSession session;
+    private Environment environment;
 
     protected AsynchronousCommand(CommandLine cmdLine) {
         this.cmdLine = cmdLine;
@@ -60,7 +65,24 @@ public abstract class AsynchronousCommand implements Command {
         this.callback = callback;
     }
 
+    public ServerSession getSession() {
+        return session;
+    }
+
+    public void setSession(ServerSession session) {
+        this.session = session;
+    }
+
+    protected User getCurrentUser() {
+        return User.get(getSession().getUsername());
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
     public void start(Environment env) throws IOException {
+        this.environment = env;
         thread = new Thread(new Runnable() {
             public void run() {
                 try {
