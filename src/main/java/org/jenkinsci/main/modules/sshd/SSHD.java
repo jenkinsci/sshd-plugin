@@ -35,7 +35,7 @@ public class SSHD extends GlobalConfiguration {
     @Inject
     private transient InstanceIdentity identity;
 
-    private int port;
+    private volatile int port;
 
     public SSHD() {
         load();
@@ -83,7 +83,7 @@ public class SSHD extends GlobalConfiguration {
                 new TripleDESCBC.Factory(),
                 new BlowfishCBC.Factory()));
 
-        sshd.setPort(0);
+        sshd.setPort(port);
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
             @Override
