@@ -41,8 +41,21 @@ public class SSHD extends GlobalConfiguration {
         load();
     }
 
+    /**
+     * Returns the configured port to run SSHD.
+     *
+     * @return
+     *      -1 to disable this, 0 to run with a random port, otherwise the port number.
+     */
     public int getPort() {
         return port;
+    }
+
+    /**
+     * Gets the current TCP/IP port that this daemon is running with.
+     */
+    public int getActualPort() {
+        return sshd.getPort();
     }
 
     public void setPort(int port) {
@@ -58,6 +71,8 @@ public class SSHD extends GlobalConfiguration {
     }
 
     public synchronized void start() throws IOException {
+        if (port<0) return; // don't start it
+
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
                 
         sshd.setCipherFactories(Arrays.asList(// AES 256 and 192 requires unlimited crypto, so don't use that
