@@ -45,6 +45,18 @@ public class SSHD extends GlobalConfiguration {
         return port;
     }
 
+    public void setPort(int port) {
+        if (this.port!=port) {
+            this.port = port;
+            MasterComputer.threadPoolForRemoting.submit(new Runnable() {
+                public void run() {
+                    restart();
+                }
+            });
+            save();
+        }
+    }
+
     public synchronized void start() throws IOException {
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
                 
@@ -84,15 +96,7 @@ public class SSHD extends GlobalConfiguration {
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
-        int newPort = new ServerTcpPort(json.getJSONObject("port")).getPort();
-        if (newPort!=port) {
-            port = newPort;
-            MasterComputer.threadPoolForRemoting.submit(new Runnable() {
-                public void run() {
-                    restart();
-                }
-            });
-        }
+        setPort(new ServerTcpPort(json.getJSONObject("port")).getPort());
         return true;
     }
 
