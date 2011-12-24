@@ -53,8 +53,11 @@ public class SSHD extends GlobalConfiguration {
 
     /**
      * Gets the current TCP/IP port that this daemon is running with.
+     *
+     * @return -1 if disabled, but never null.
      */
     public int getActualPort() {
+        if (port==-1)   return -1;
         return sshd.getPort();
     }
 
