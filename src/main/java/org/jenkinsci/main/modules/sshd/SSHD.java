@@ -112,6 +112,10 @@ public class SSHD extends GlobalConfiguration {
         }
     }
 
+    public void stop() throws InterruptedException {
+        sshd.stop(true);
+    }
+
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
         setPort(new ServerTcpPort(json.getJSONObject("port")).getPort());
