@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  */
 @Extension
 public class SSHD extends GlobalConfiguration {
-    private transient final SshServer sshd = SshServer.setUpDefaultServer();
+    private transient SshServer sshd;
 
     @Inject
     private transient InstanceIdentity identity;
@@ -58,7 +58,9 @@ public class SSHD extends GlobalConfiguration {
      */
     public int getActualPort() {
         if (port==-1)   return -1;
-        return sshd.getPort();
+        if (sshd!=null)
+            return sshd.getPort();
+        return port;
     }
 
     public void setPort(int port) {
@@ -73,8 +75,11 @@ public class SSHD extends GlobalConfiguration {
         }
     }
 
-    public synchronized void start() throws IOException {
+    public synchronized void start() throws IOException, InterruptedException {
         if (port<0) return; // don't start it
+
+        stop();
+        sshd = SshServer.setUpDefaultServer();
 
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
                 
@@ -105,7 +110,10 @@ public class SSHD extends GlobalConfiguration {
 
     public synchronized void restart() {
         try {
-            sshd.stop(false);
+            if (sshd!=null) {
+                sshd.stop(false);
+                sshd = null;
+            }
             start();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to restart SSHD", e);
@@ -113,7 +121,10 @@ public class SSHD extends GlobalConfiguration {
     }
 
     public void stop() throws InterruptedException {
-        sshd.stop(true);
+        if (sshd!=null) {
+            sshd.stop(true);
+            sshd = null;
+        }
     }
 
     @Override
@@ -129,7 +140,7 @@ public class SSHD extends GlobalConfiguration {
     }
 
     @Initializer(after= InitMilestone.JOB_LOADED)
-    public static void init() throws IOException {
+    public static void init() throws IOException, InterruptedException {
         get().start();
     }
 
