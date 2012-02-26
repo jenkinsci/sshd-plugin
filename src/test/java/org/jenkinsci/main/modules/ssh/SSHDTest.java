@@ -23,5 +23,11 @@ public class SSHDTest extends HudsonTestCase {
             configRoundtrip();
             assertEquals(i,sshd.getPort());
         }
+
+        for (int i : new int[]{-1, 0, 1000}) {
+            sshd.setIdleTimeout(i);
+            configRoundtrip();
+            assertEquals(i < 1 ? SSHD.DEFAULT_TIMEOUT_SEC : i, sshd.getIdleTimeout());
+        }
     }
 }

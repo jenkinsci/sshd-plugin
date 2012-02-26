@@ -14,6 +14,7 @@ import org.apache.sshd.common.cipher.AES128CBC;
 import org.apache.sshd.common.cipher.BlowfishCBC;
 import org.apache.sshd.common.cipher.TripleDESCBC;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
+import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.UserAuth;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 import org.kohsuke.stapler.StaplerRequest;
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,8 +39,37 @@ public class SSHD extends GlobalConfiguration {
 
     private volatile int port;
 
+    public transient final static int DEFAULT_TIMEOUT_SEC = 60*10;
+    private volatile Integer idleTimeout;
+
     public SSHD() {
         load();
+    }
+
+    /**
+     * Returns the configured SSHD idle connection timeout in seconds.
+     *
+     * @return
+     */
+    public int getIdleTimeout() {
+        return idleTimeout == null ? DEFAULT_TIMEOUT_SEC : idleTimeout;
+    }
+
+    /**
+     * Sets SSHD idle connection timeout.
+     *
+     * @param idleTimeout Idle timeout value in seconds.
+     */
+    public void setIdleTimeout(int idleTimeout) {
+        if(getIdleTimeout() != idleTimeout) {
+            this.idleTimeout = idleTimeout;
+            MasterComputer.threadPoolForRemoting.submit(new Runnable() {
+                public void run() {
+                    restart();
+                }
+            });
+            save();
+        }
     }
 
     /**
@@ -99,6 +130,9 @@ public class SSHD extends GlobalConfiguration {
 
         sshd.setPublickeyAuthenticator(new PublicKeyAuthenticatorImpl());
 
+        Map<String, String> properties = sshd.getProperties();
+        properties.put(ServerFactoryManager.IDLE_TIMEOUT, String.valueOf(getIdleTimeout()*1000));
+
         sshd.start();
         LOGGER.info("Started SSHD at port " + sshd.getPort());
     }
@@ -119,6 +153,9 @@ public class SSHD extends GlobalConfiguration {
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
         setPort(new ServerTcpPort(json.getJSONObject("port")).getPort());
+
+        int timeOut = json.optInt("idleTimeout", DEFAULT_TIMEOUT_SEC);
+        setIdleTimeout(timeOut < 1 ? DEFAULT_TIMEOUT_SEC : timeOut);
         return true;
     }
 
