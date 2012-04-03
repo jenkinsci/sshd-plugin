@@ -1,6 +1,9 @@
 package org.jenkinsci.main.modules.sshd;
 
 import hudson.model.User;
+import jenkins.model.Jenkins;
+import org.acegisecurity.Authentication;
+import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
@@ -74,7 +77,10 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
     }
 
     protected User getCurrentUser() {
-        return User.get(getSession().getUsername());
+        if (Jenkins.getInstance().isUseSecurity())
+            return User.get(getSession().getUsername());    // then UserAuthNamedFactory must have done public key auth
+        else
+            return null;    // not authenticated. anonymous.
     }
 
     public Environment getEnvironment() {
@@ -87,11 +93,19 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
             public void run() {
                 try {
                     int i;
+
+                    // run the command in the context of the authenticated user
+                    Authentication old = SecurityContextHolder.getContext().getAuthentication();
+                    User user = getCurrentUser();
+                    if (user!=null)
+                        SecurityContextHolder.getContext().setAuthentication(user.impersonate());
+
                     try {
                         i = AsynchronousCommand.this.run();
                     } finally {
                         out.flush(); // working around SSHD-154
                         err.flush();
+                        SecurityContextHolder.getContext().setAuthentication(old);
                     }
                     callback.onExit(i);
                 } catch (Exception e) {

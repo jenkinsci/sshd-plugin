@@ -2,6 +2,7 @@ package org.jenkinsci.main.modules.sshd;
 
 import hudson.Extension;
 import hudson.cli.CLICommand;
+import hudson.model.User;
 import jenkins.model.Jenkins;
 import org.apache.sshd.server.Command;
 
@@ -26,8 +27,8 @@ public class CLICommandAdapter extends SshCommandFactory {
             protected int run() throws Exception {
                 // run as the authenticated user if we've actually authenticated the user,
                 // or otherwise run as anonymous
-                if (Jenkins.getInstance().isUseSecurity())
-                    c.setTransportAuth(getCurrentUser().impersonate());
+                User u = getCurrentUser();
+                if (u!=null)    c.setTransportAuth(u.impersonate());
 
                 CommandLine cmds = getCmdLine();
                 return c.main(cmds.subList(1,cmds.size()), Locale.getDefault(), getInputStream(), new PrintStream(getOutputStream()), new PrintStream(getErrorStream()));
