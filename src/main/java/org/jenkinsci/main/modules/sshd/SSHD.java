@@ -139,7 +139,7 @@ public class SSHD extends GlobalConfiguration {
         return Jenkins.getInstance().getExtensionList(GlobalConfiguration.class).get(SSHD.class);
     }
 
-    @Initializer(after= InitMilestone.JOB_LOADED)
+    @Initializer(after= InitMilestone.JOB_LOADED,fatal=false)
     public static void init() throws IOException, InterruptedException {
         get().start();
     }
