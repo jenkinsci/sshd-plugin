@@ -14,6 +14,7 @@ import org.jenkinsci.main.modules.sshd.SshCommandFactory.CommandLine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,7 +110,11 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
                     }
                     callback.onExit(i);
                 } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "SSH command execution failed: "+e.getMessage(), e);
+                    // report the cause of the death to the client
+                    PrintStream ps = new PrintStream(err);
+                    e.printStackTrace(ps);
+                    ps.flush();
+
                     callback.onExit(255,e.getMessage());
                 }
             }
@@ -124,6 +129,4 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
         if (thread!=null)
             thread.interrupt();
     }
-
-    private static final Logger LOGGER = Logger.getLogger(AsynchronousCommand.class.getName());
 }
