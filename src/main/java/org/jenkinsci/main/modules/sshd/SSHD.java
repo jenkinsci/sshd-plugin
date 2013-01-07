@@ -144,4 +144,12 @@ public class SSHD extends GlobalConfiguration {
         get().start();
     }
 
+    private static Logger MINA_LOGGER = Logger.getLogger("org.apache.sshd");
+
+    static {
+        // logging is way too verbose at INFO level, so trim it down to WARNING
+        // unless someone has already set that value, in which case we honor that
+        if (MINA_LOGGER.getLevel()==null)
+            MINA_LOGGER.setLevel(Level.WARNING);
+    }
 }
