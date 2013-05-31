@@ -1,8 +1,8 @@
 package org.jenkinsci.main.modules.sshd;
 
 import hudson.model.User;
+import hudson.security.ACL;
 import jenkins.model.Jenkins;
-import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.acegisecurity.context.SecurityContext;
 
 /**
  * Partial {@link Command} implementation that uses a thread to run a command.
@@ -96,17 +95,17 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
                     int i;
 
                     // run the command in the context of the authenticated user
-                    Authentication old = SecurityContextHolder.getContext().getAuthentication();
+                    SecurityContext old = SecurityContextHolder.getContext();
                     User user = getCurrentUser();
                     if (user!=null)
-                        SecurityContextHolder.getContext().setAuthentication(user.impersonate());
+                        ACL.impersonate(user.impersonate());
 
                     try {
                         i = AsynchronousCommand.this.run();
                     } finally {
                         out.flush(); // working around SSHD-154
                         err.flush();
-                        SecurityContextHolder.getContext().setAuthentication(old);
+                        SecurityContextHolder.setContext(old);
                     }
                     callback.onExit(i);
                 } catch (Exception e) {
