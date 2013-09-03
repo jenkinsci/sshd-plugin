@@ -85,6 +85,7 @@ public class SSHD extends GlobalConfiguration {
                 
         sshd.setCipherFactories(Arrays.asList(// AES 256 and 192 requires unlimited crypto, so don't use that
                 new AES128CBC.Factory(),
+                new AES128CTR.Factory(),
                 new TripleDESCBC.Factory(),
                 new BlowfishCBC.Factory()));
 
