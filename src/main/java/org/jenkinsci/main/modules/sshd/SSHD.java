@@ -11,6 +11,7 @@ import net.sf.json.JSONObject;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.AES128CBC;
+import org.apache.sshd.common.cipher.AES128CTR;
 import org.apache.sshd.common.cipher.BlowfishCBC;
 import org.apache.sshd.common.cipher.TripleDESCBC;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
