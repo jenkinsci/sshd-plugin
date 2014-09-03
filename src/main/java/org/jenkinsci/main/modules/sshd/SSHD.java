@@ -106,6 +106,9 @@ public class SSHD extends GlobalConfiguration {
 
         sshd.setPublickeyAuthenticator(new PublicKeyAuthenticatorImpl());
 
+        // set idle timeout to 3 hours
+        sshd.getProperties().put(org.apache.sshd.server.ServerFactoryManager.IDLE_TIMEOUT, String.valueOf(3*60*60*1000));
+
         sshd.start();
         LOGGER.info("Started SSHD at port " + sshd.getPort());
     }
