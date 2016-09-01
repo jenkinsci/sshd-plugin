@@ -14,7 +14,10 @@ import org.jenkinsci.main.modules.sshd.SshCommandFactory.CommandLine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+
 import org.acegisecurity.context.SecurityContext;
 
 import javax.annotation.CheckForNull;
