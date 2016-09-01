@@ -70,6 +70,6 @@ public abstract class SshCommandFactory implements ExtensionPoint {
     }
 
     public static ExtensionList<SshCommandFactory> all() {
-        return Jenkins.getInstance().getExtensionList(SshCommandFactory.class);
+        return ExtensionList.lookup(SshCommandFactory.class);
     }
 }

@@ -1,6 +1,7 @@
 package org.jenkinsci.main.modules.sshd;
 
 import hudson.Extension;
+import hudson.ExtensionList;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import jenkins.model.GlobalConfiguration;
@@ -159,7 +160,7 @@ public class SSHD extends GlobalConfiguration {
     private static final Logger LOGGER = Logger.getLogger(SSHD.class.getName());
 
     public static SSHD get() {
-        return Jenkins.getInstance().getExtensionList(GlobalConfiguration.class).get(SSHD.class);
+        return ExtensionList.lookup(GlobalConfiguration.class).get(SSHD.class);
     }
 
     @Initializer(after= InitMilestone.JOB_LOADED,fatal=false)
