@@ -20,6 +20,7 @@ import org.apache.sshd.server.UserAuth;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 import org.kohsuke.stapler.StaplerRequest;
 
+import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.security.KeyPair;
@@ -32,6 +33,8 @@ import java.util.logging.Logger;
  */
 @Extension
 public class SSHD extends GlobalConfiguration {
+
+    @GuardedBy("this")
     private transient SshServer sshd;
 
     @Inject
@@ -58,7 +61,7 @@ public class SSHD extends GlobalConfiguration {
      *
      * @return -1 if disabled, but never null.
      */
-    public int getActualPort() {
+    public synchronized int getActualPort() {
         if (port==-1)   return -1;
         if (sshd!=null)
             return sshd.getPort();
@@ -138,7 +141,7 @@ public class SSHD extends GlobalConfiguration {
         }
     }
 
-    public void stop() throws InterruptedException {
+    public synchronized void stop() throws InterruptedException {
         if (sshd!=null) {
             sshd.stop(true);
             sshd = null;
