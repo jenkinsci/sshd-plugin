@@ -115,7 +115,8 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
                     callback.onExit(i);
                 } catch (Exception e) {
                     // report the cause of the death to the client
-                    PrintStream ps = new PrintStream(err);
+                    //TODO: Consider switching to UTF-8
+                    PrintWriter ps = new PrintWriter(new OutputStreamWriter(err, Charset.defaultCharset()));
                     e.printStackTrace(ps);
                     ps.flush();
 

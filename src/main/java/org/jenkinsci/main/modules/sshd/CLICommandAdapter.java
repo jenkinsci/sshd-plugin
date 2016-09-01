@@ -7,6 +7,7 @@ import jenkins.model.Jenkins;
 import org.apache.sshd.server.Command;
 
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.Locale;
 
 /**
@@ -31,7 +32,11 @@ public class CLICommandAdapter extends SshCommandFactory {
                 if (u!=null)    c.setTransportAuth(u.impersonate());
 
                 CommandLine cmds = getCmdLine();
-                return c.main(cmds.subList(1,cmds.size()), Locale.getDefault(), getInputStream(), new PrintStream(getOutputStream()), new PrintStream(getErrorStream()));
+
+                //TODO: Consider switching to UTF-8
+                return c.main(cmds.subList(1,cmds.size()), Locale.getDefault(), getInputStream(),
+                        new PrintStream(getOutputStream(), false, Charset.defaultCharset().toString()),
+                        new PrintStream(getErrorStream(), false, Charset.defaultCharset().toString()));
             }
         };
     }
