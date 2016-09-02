@@ -14,8 +14,13 @@ import org.jenkinsci.main.modules.sshd.SshCommandFactory.CommandLine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+
 import org.acegisecurity.context.SecurityContext;
+
+import javax.annotation.CheckForNull;
 
 /**
  * Partial {@link Command} implementation that uses a thread to run a command.
@@ -76,11 +81,14 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
         this.session = session;
     }
 
+    @CheckForNull
     protected User getCurrentUser() {
-        if (Jenkins.getInstance().isUseSecurity())
+        final Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins != null && jenkins.isUseSecurity()) {
             return User.get(getSession().getUsername());    // then UserAuthNamedFactory must have done public key auth
-        else
+        } else {
             return null;    // not authenticated. anonymous.
+        }
     }
 
     public Environment getEnvironment() {
@@ -110,7 +118,8 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
                     callback.onExit(i);
                 } catch (Exception e) {
                     // report the cause of the death to the client
-                    PrintStream ps = new PrintStream(err);
+                    //TODO: Consider switching to UTF-8
+                    PrintWriter ps = new PrintWriter(new OutputStreamWriter(err, Charset.defaultCharset()));
                     e.printStackTrace(ps);
                     ps.flush();
 

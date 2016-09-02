@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.466</version>
+    <version>2.13</version>
   </parent>
 
   <groupId>org.jenkins-ci.modules</groupId>
@@ -25,12 +25,18 @@
     </license>
   </licenses>
 
+  <properties>
+    <jenkins.version>1.580.3</jenkins.version>
+    <java.level>6</java.level>
+    <jenkins-test-harness.version>1.580.3</jenkins-test-harness.version>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.jenkins-ci.tools</groupId>
         <artifactId>maven-hpi-plugin</artifactId>
-        <version>1.79</version>
+        <version>1.119</version>
         <extensions>true</extensions>
       </plugin>
     </plugins>

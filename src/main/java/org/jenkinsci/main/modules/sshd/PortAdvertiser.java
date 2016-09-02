@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.model.PageDecorator;
 import jenkins.model.Jenkins;
 
+import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import java.net.URL;
 import java.util.logging.Level;
@@ -18,12 +19,18 @@ import java.util.logging.Logger;
 public class PortAdvertiser extends PageDecorator {
     @Inject
     public SSHD sshd;
-    
+
+    @CheckForNull
     public String getEndpoint() {
         try {
             int p = sshd.getActualPort();
-            if (p>0)
-                return (host!=null?host:new URL(Jenkins.getInstance().getRootUrl()).getHost())+":"+ p;
+            if (p>0) {
+                final Jenkins jenkins = Jenkins.getInstance();
+                if (jenkins == null) {
+                    throw new IllegalStateException("Jenkins has not been started, or was already shut down");
+                }
+                return (host != null ? host : new URL(jenkins.getRootUrl()).getHost()) + ":" + p;
+            }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Failed to advertise SSH port",e);
         }

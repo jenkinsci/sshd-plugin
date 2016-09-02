@@ -7,6 +7,7 @@ import org.apache.sshd.server.ExitCallback;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * {@link Command} implementation that exits by complaining that there's no such command.
@@ -37,7 +38,8 @@ public class InvalidCommand implements Command {
     }
 
     public void start(Environment env) throws IOException {
-        err.write(("Unknown command: "+command+"\n").getBytes());
+        //TODO: Consider switching to UTF-8
+        err.write(("Unknown command: "+command+"\n").getBytes(Charset.defaultCharset()));
         err.flush(); // working around SSHD-154
         err.close();
         callback.onExit(255,"Unknown command: "+command);
