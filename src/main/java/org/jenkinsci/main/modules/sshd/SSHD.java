@@ -10,6 +10,7 @@ import jenkins.model.Jenkins.MasterComputer;
 import jenkins.util.ServerTcpPort;
 import net.sf.json.JSONObject;
 import org.apache.sshd.SshServer;
+import org.apache.sshd.common.Cipher;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.AES128CTR;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
@@ -85,8 +86,8 @@ public class SSHD extends GlobalConfiguration {
 
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
                 
-        sshd.setCipherFactories(Arrays.asList(// AES 256 and 192 requires unlimited crypto, so don't use that
-                                              // CBC modes are not secure, so dropping them
+        sshd.setCipherFactories(Arrays.<NamedFactory<Cipher>>asList(// AES 256 and 192 requires unlimited crypto, so don't use that
+                                              // CBC modes are not secure, so they have been dropped (see JENKINS-39805)
                                               new AES128CTR.Factory()));
 
         sshd.setPort(port);
