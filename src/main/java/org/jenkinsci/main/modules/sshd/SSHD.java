@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,10 +95,8 @@ public class SSHD extends GlobalConfiguration {
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
             @Override
-            protected KeyPair[] loadKeys() {
-                return new KeyPair[] {
-                        new KeyPair(identity.getPublic(),identity.getPrivate())
-                };
+            public Iterable<KeyPair> loadKeys() {
+                return Collections.singletonList(new KeyPair(identity.getPublic(),identity.getPrivate()));
             }
         });
 
