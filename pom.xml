@@ -8,7 +8,7 @@
 
   <groupId>org.jenkins-ci.modules</groupId>
   <artifactId>sshd</artifactId>
-  <version>1.9-SNAPSHOT</version>
+  <version>1.9</version>
   <packaging>jenkins-module</packaging>
   <name>SSH server</name>
   <description>Adds SSH server functionality to Jenkins, exposing CLI commands through it</description>
@@ -16,7 +16,7 @@
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-module.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jenkinsci/${project.artifactId}-module.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>sshd-1.9</tag>
   </scm>
 
   <licenses>
