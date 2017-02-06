@@ -5,6 +5,7 @@ import hudson.ExtensionList;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import jenkins.model.GlobalConfiguration;
+import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.model.Jenkins.MasterComputer;
 import jenkins.util.ServerTcpPort;
@@ -32,6 +33,11 @@ import java.util.logging.Logger;
  */
 @Extension
 public class SSHD extends GlobalConfiguration {
+
+    @Override
+    public GlobalConfigurationCategory getCategory() {
+        return GlobalConfigurationCategory.get(GlobalConfigurationCategory.Security.class);
+    }
 
     @GuardedBy("this")
     private transient SshServer sshd;
