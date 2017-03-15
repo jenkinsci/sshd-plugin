@@ -3,7 +3,7 @@ package org.jenkinsci.main.modules.sshd;
 import com.trilead.ssh2.crypto.Base64;
 import com.trilead.ssh2.packets.TypesWriter;
 import hudson.model.User;
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
