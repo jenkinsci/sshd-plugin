@@ -45,7 +45,7 @@ public class SSHD extends GlobalConfiguration {
     @Inject
     private transient InstanceIdentity identity;
 
-    private volatile int port;
+    private volatile int port = -1;
 
     public SSHD() {
         load();
