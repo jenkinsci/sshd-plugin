@@ -1,9 +1,16 @@
 Changelog
 ====
 
+##### 1.11
+
+Release date: (Apr 07, 2017) => Jenkins `TODO`
+
+* [JENKINS-33595](https://issues.jenkins-ci.org/browse/JENKINS-33595) -
+Disable SSHD port by default on new installations.
+
 ##### 1.10
 
-Release date: (Mar 11, 2017) => Jenkins `TODO`
+Release date: (Mar 11, 2017) => Jenkins `2.51`
 
 * [PR #9](https://github.com/jenkinsci/sshd-module/pull/9) - 
 Move SSH server port configuration to security options page.
