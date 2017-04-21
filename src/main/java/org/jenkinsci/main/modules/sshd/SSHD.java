@@ -4,29 +4,27 @@ import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
-import jenkins.model.GlobalConfiguration;
-import jenkins.model.GlobalConfigurationCategory;
-import jenkins.model.Jenkins;
-import jenkins.model.Jenkins.MasterComputer;
-import jenkins.util.ServerTcpPort;
-import net.sf.json.JSONObject;
-import org.apache.sshd.SshServer;
-import org.apache.sshd.common.Cipher;
-import org.apache.sshd.common.NamedFactory;
-import org.apache.sshd.common.cipher.AES128CTR;
-import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
-import org.apache.sshd.server.UserAuth;
-import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
-import org.kohsuke.stapler.StaplerRequest;
-
-import javax.annotation.concurrent.GuardedBy;
-import javax.inject.Inject;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.concurrent.GuardedBy;
+import javax.inject.Inject;
+import jenkins.model.GlobalConfiguration;
+import jenkins.model.GlobalConfigurationCategory;
+import jenkins.model.Jenkins.MasterComputer;
+import jenkins.util.ServerTcpPort;
+import net.sf.json.JSONObject;
+import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.common.cipher.BuiltinCiphers;
+import org.apache.sshd.common.cipher.Cipher;
+import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.UserAuth;
+import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -95,7 +93,7 @@ public class SSHD extends GlobalConfiguration {
                 
         sshd.setCipherFactories(Arrays.<NamedFactory<Cipher>>asList(// AES 256 and 192 requires unlimited crypto, so don't use that
                                               // CBC modes are not secure, so they have been dropped (see JENKINS-39805)
-                                              new AES128CTR.Factory()));
+                                              BuiltinCiphers.aes128ctr));
 
         sshd.setPort(port);
 
@@ -142,7 +140,7 @@ public class SSHD extends GlobalConfiguration {
         }
     }
 
-    public synchronized void stop() throws InterruptedException {
+    public synchronized void stop() throws IOException, InterruptedException {
         if (sshd!=null) {
             sshd.stop(true);
             sshd = null;
