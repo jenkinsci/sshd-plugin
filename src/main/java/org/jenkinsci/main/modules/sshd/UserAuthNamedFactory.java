@@ -2,9 +2,9 @@ package org.jenkinsci.main.modules.sshd;
 
 import jenkins.model.Jenkins;
 import org.apache.sshd.common.NamedFactory;
-import org.apache.sshd.server.UserAuth;
-import org.apache.sshd.server.auth.UserAuthNone;
-import org.apache.sshd.server.auth.UserAuthPublicKey;
+import org.apache.sshd.server.auth.UserAuth;
+import org.apache.sshd.server.auth.UserAuthNoneFactory;
+import org.apache.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 
 /**
  * Depending on the current security configuration, activate either public key auth or no auth.
@@ -12,8 +12,8 @@ import org.apache.sshd.server.auth.UserAuthPublicKey;
  * @author Kohsuke Kawaguchi
  */
 class UserAuthNamedFactory implements NamedFactory<UserAuth> {
-    NamedFactory<UserAuth> publicKey = new UserAuthPublicKey.Factory();
-    NamedFactory<UserAuth> none = new UserAuthNone.Factory();
+    NamedFactory<UserAuth> publicKey = UserAuthPublicKeyFactory.INSTANCE;
+    NamedFactory<UserAuth> none = UserAuthNoneFactory.INSTANCE;
 
     private NamedFactory<UserAuth> select() {
         final Jenkins jenkins = Jenkins.getInstance();

@@ -1,7 +1,7 @@
 package org.jenkinsci.main.modules.sshd;
 
 import hudson.model.User;
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
