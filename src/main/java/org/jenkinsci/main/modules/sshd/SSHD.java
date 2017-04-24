@@ -108,7 +108,7 @@ public class SSHD extends GlobalConfiguration {
                 if (c.isSupported()) {
                     activatedCiphers.add(cipher);
                 } else {
-                    LOGGER.log(Level.WARNING, "Discovered unsupported built-in Cipher: {0}. It won't be enabled", c);
+                    LOGGER.log(Level.FINE, "Discovered unsupported built-in Cipher: {0}. It won't be enabled", c);
                 }
             } else {
                 // We cannot determine if the cipher is supported, but the default configuration lists only Built-in ciphers.
