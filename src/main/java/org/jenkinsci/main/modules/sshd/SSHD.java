@@ -6,10 +6,13 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import java.io.IOException;
 import java.security.KeyPair;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
 import jenkins.model.GlobalConfiguration;
@@ -32,6 +35,14 @@ import org.kohsuke.stapler.StaplerRequest;
 @Extension
 public class SSHD extends GlobalConfiguration {
 
+    //TODO: Make Ciphers configurable from UI, with logic similar to Remoting protocols?
+    /**
+     * Lists Built-in Ciphers, which are enabled by default in SSH Core
+     */
+    private static final List<NamedFactory<Cipher>> ENABLED_CIPHERS = Arrays.<NamedFactory<Cipher>>asList(
+        BuiltinCiphers.aes128ctr, BuiltinCiphers.aes192ctr, BuiltinCiphers.aes256ctr
+    );
+    
     @Override
     public GlobalConfigurationCategory getCategory() {
         return GlobalConfigurationCategory.get(GlobalConfigurationCategory.Security.class);
@@ -83,6 +94,31 @@ public class SSHD extends GlobalConfiguration {
         }
     }
 
+    /**
+     * Provides a list of Cipher factories, which can be activated on the instance.
+     * Cyphers will be considered as activated if they are defined in {@link #ENABLED_CIPHERS} and supported in the current JVM.
+     * @return List of factories
+     */
+    @Nonnull
+    /*package*/ static List<NamedFactory<Cipher>> getActivatedCiphers() {
+        final List<NamedFactory<Cipher>> activatedCiphers = new ArrayList<>(ENABLED_CIPHERS.size());
+        for (NamedFactory<Cipher> cipher : ENABLED_CIPHERS) {
+            if (cipher instanceof BuiltinCiphers) {
+                final BuiltinCiphers c = (BuiltinCiphers)cipher;
+                if (c.isSupported()) {
+                    activatedCiphers.add(cipher);
+                } else {
+                    LOGGER.log(Level.WARNING, "Discovered unsupported built-in Cipher: {0}. It won't be enabled", c);
+                }
+            } else {
+                // We cannot determine if the cipher is supported, but the default configuration lists only Built-in ciphers.
+                // So somebody explicitly added it on his own risk.
+                activatedCiphers.add(cipher);
+            }
+         }
+        return activatedCiphers;
+    }
+    
     public synchronized void start() throws IOException, InterruptedException {
         if (port<0) return; // don't start it
 
@@ -90,11 +126,8 @@ public class SSHD extends GlobalConfiguration {
         sshd = SshServer.setUpDefaultServer();
 
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
-                
-        sshd.setCipherFactories(Arrays.<NamedFactory<Cipher>>asList(// AES 256 and 192 requires unlimited crypto, so don't use that
-                                              // CBC modes are not secure, so they have been dropped (see JENKINS-39805)
-                                              BuiltinCiphers.aes128ctr));
-
+        
+        sshd.setCipherFactories(getActivatedCiphers());
         sshd.setPort(port);
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
@@ -127,7 +160,7 @@ public class SSHD extends GlobalConfiguration {
         sshd.start();
         LOGGER.info("Started SSHD at port " + sshd.getPort());
     }
-
+    
     public synchronized void restart() {
         try {
             if (sshd!=null) {
