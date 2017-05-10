@@ -1,9 +1,30 @@
 Changelog
 ====
 
+##### 2.0
+
+Release Date: Coming soon
+
+* Update from SSHD Core `0.14.0` to Apache MINA SSHD `1.5.0`
+  * See links to the integrated changes below
+* [JENKINS-43668](https://issues.jenkins-ci.org/browse/JENKINS-43668) - 
+Cleanup [Trilead SSH-2](https://github.com/jenkinsci/trilead-ssh2) usages in the SSHD Module.
+* [JENKINS-39738](https://issues.jenkins-ci.org/browse/JENKINS-39738) -
+Enable `aes192ctr` and `aes256ctr` ciphers if JVM supports them (unlimited-strength encryption).
+
+Integrated SSHD Changes:
+
+* [SSHD 1.0.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12323302&styleName=&projectId=12310849)
+* [SSHD 1.1.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12333293&styleName=&projectId=12310849)
+* [SSHD 1.1.1](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12335067&styleName=&projectId=12310849)
+* [SSHD 1.2.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334702&styleName=&projectId=12310849)
+* [SSHD 1.3.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12335499&styleName=&projectId=12310849)
+* [SSHD 1.4.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12338322&styleName=&projectId=12310849)
+* [SSHD 1.5.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12339674&styleName=&projectId=12310849)
+
 ##### 1.11
 
-Release date: (Apr 07, 2017) => Jenkins `TODO`
+Release date: (Apr 07, 2017) => Jenkins `2.54`
 
 * [JENKINS-33595](https://issues.jenkins-ci.org/browse/JENKINS-33595) -
 Disable SSHD port by default on new installations.
