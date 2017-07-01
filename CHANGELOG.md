@@ -5,7 +5,7 @@ Changelog
 
 Release Date: Coming soon
 
-* Update from SSHD Core `0.14.0` to Apache MINA SSHD `1.5.0`
+* Update from SSHD Core `0.14.0` to Apache MINA SSHD `1.6.0`
   * See links to the integrated changes below
 * [JENKINS-43668](https://issues.jenkins-ci.org/browse/JENKINS-43668) - 
 Cleanup [Trilead SSH-2](https://github.com/jenkinsci/trilead-ssh2) usages in the SSHD Module.
@@ -20,7 +20,8 @@ Integrated SSHD Changes:
 * [SSHD 1.2.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334702&styleName=&projectId=12310849)
 * [SSHD 1.3.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12335499&styleName=&projectId=12310849)
 * [SSHD 1.4.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12338322&styleName=&projectId=12310849)
-* [SSHD 1.5.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12339674&styleName=&projectId=12310849)
+* SSHD 1.5.0 - N/A, the release has been burhed
+* [SSHD 1.6.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12340583&styleName=&projectId=12310849)
 
 ##### 1.11
 
