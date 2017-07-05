@@ -3,7 +3,7 @@ Changelog
 
 ##### 2.0
 
-Release Date: Coming soon
+Release Date: (July 05, 2017)
 
 * Update from SSHD Core `0.14.0` to Apache MINA SSHD `1.6.0`
   * See links to the integrated changes below
