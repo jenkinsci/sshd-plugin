@@ -23,6 +23,8 @@ Integrated SSHD Changes:
 * SSHD 1.5.0 - N/A, the release has been burhed
 * [SSHD 1.6.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12340583&styleName=&projectId=12310849)
 
+:exclamation: **Compatibility Notice** Plugins which referred to arbitrary `org.apache.sshd.**` classes may not work unless updated to use the `pluginFirstClassLoader` flag to bundle their own private copy in a fixed version. Plugins merely using the `SshCommandFactory` extension point to offer SSH services (`workflowLibs.git`, for example) should be unaffected.
+
 ##### 1.11
 
 Release date: (Apr 07, 2017) => Jenkins `2.54`
