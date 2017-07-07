@@ -1,7 +1,7 @@
 Changelog
 ====
 
-##### 2.0
+#### 2.0
 
 Release Date: (July 05, 2017)
 
@@ -23,23 +23,27 @@ Integrated SSHD Changes:
 * SSHD 1.5.0 - N/A, the release has been burhed
 * [SSHD 1.6.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12340583&styleName=&projectId=12310849)
 
-:exclamation: **Compatibility Notice** Plugins which referred to arbitrary `org.apache.sshd.**` classes may not work unless updated to use the `pluginFirstClassLoader` flag to bundle their own private copy in a fixed version. Plugins merely using the `SshCommandFactory` extension point to offer SSH services (`workflowLibs.git`, for example) should be unaffected.
+##### 2.0 Compatibility notice
 
-##### 1.11
+* Plugins merely using the `SshCommandFactory` extension point to offer SSH services (`workflowLibs.git`, for example) should be unaffected.
+* Plugins which referred to arbitrary `org.apache.sshd.**` classes may not work unless updated to use the `pluginFirstClassLoader` flag to bundle their own private copy in a fixed version
+  * We do not see such plugins in https://github.com/jenkinsci and other public repositories
+
+#### 1.11
 
 Release date: (Apr 07, 2017) => Jenkins `2.54`
 
 * [JENKINS-33595](https://issues.jenkins-ci.org/browse/JENKINS-33595) -
 Disable SSHD port by default on new installations.
 
-##### 1.10
+#### 1.10
 
 Release date: (Mar 11, 2017) => Jenkins `2.51`
 
 * [PR #9](https://github.com/jenkinsci/sshd-module/pull/9) - 
 Move SSH server port configuration to security options page.
 
-##### 1.9
+#### 1.9
 
 Release date: (Dec 11, 2016) => Jenkins `2.37`, backported to `2.32.2`
 
@@ -59,7 +63,7 @@ Integrated SSHD Core Changes:
 * [SSHD Core 0.13.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310849&version=12327342)
 * [SSHD Core 0.14.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310849&version=12329012)
 
-##### Previous
+#### Previous
 
 There is no changelogs for this release and previous ones. 
 See the commit history.
