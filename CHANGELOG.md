@@ -20,7 +20,7 @@ Integrated SSHD Changes:
 * [SSHD 1.2.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334702&styleName=&projectId=12310849)
 * [SSHD 1.3.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12335499&styleName=&projectId=12310849)
 * [SSHD 1.4.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12338322&styleName=&projectId=12310849)
-* SSHD 1.5.0 - N/A, the release has been burhed
+* SSHD 1.5.0 - N/A, the release has been burned
 * [SSHD 1.6.0](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12340583&styleName=&projectId=12310849)
 
 ##### 2.0 Compatibility notice
