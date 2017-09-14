@@ -125,6 +125,7 @@ public class SSHD extends GlobalConfiguration {
     }
     
     public synchronized void start() throws IOException, InterruptedException {
+        int port = this.port; // Capture local copy to prevent race conditions. Setting port to -1 after the check would blow up later.
         if (port<0) return; // don't start it
 
         stop();
