@@ -64,7 +64,7 @@ public class SSHD extends GlobalConfiguration {
      * Returns the configured port to run SSHD.
      *
      * @return
-     *      -1 to disable this, 0 to run with a random port, otherwise the port number.
+     *      -1 if disabled, 0 if random port is selected, otherwise the port number configured.
      */
     public int getPort() {
         return port;
@@ -73,7 +73,7 @@ public class SSHD extends GlobalConfiguration {
     /**
      * Gets the current TCP/IP port that this daemon is running with.
      *
-     * @return -1 if disabled, but never null.
+     * @return Actual port number or -1 if disabled.
      */
     public synchronized int getActualPort() {
         if (port==-1)   return -1;
@@ -82,6 +82,11 @@ public class SSHD extends GlobalConfiguration {
         return port;
     }
 
+    /**
+     * Set the port number to be used.
+     *
+     * @param port -1 to disable this, 0 to run with a random port, otherwise the port number.
+     */
     public void setPort(int port) {
         if (this.port!=port) {
             this.port = port;
