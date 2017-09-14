@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
+
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins.MasterComputer;
@@ -206,7 +207,15 @@ public class SSHD extends GlobalConfiguration {
 
     @Initializer(after= InitMilestone.JOB_LOADED,fatal=false)
     public static void init() throws IOException, InterruptedException {
-        get().start();
+        MasterComputer.threadPoolForRemoting.submit(new Runnable() {
+            @Override public void run() {
+                try {
+                    get().start();
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Failed to start SSHD", e);
+                }
+            }
+        });
     }
 
     private static Logger MINA_LOGGER = Logger.getLogger("org.apache.sshd");
