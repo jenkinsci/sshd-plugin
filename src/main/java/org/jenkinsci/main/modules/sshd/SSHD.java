@@ -12,13 +12,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.CheckForSigned;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
+
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins.MasterComputer;
 import jenkins.util.ServerTcpPort;
+import jenkins.util.Timer;
 import net.sf.json.JSONObject;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
@@ -54,7 +57,7 @@ public class SSHD extends GlobalConfiguration {
     @Inject
     private transient InstanceIdentity identity;
 
-    private volatile int port = -1;
+    private volatile @CheckForSigned int port = -1;
 
     public SSHD() {
         load();
@@ -64,28 +67,33 @@ public class SSHD extends GlobalConfiguration {
      * Returns the configured port to run SSHD.
      *
      * @return
-     *      -1 to disable this, 0 to run with a random port, otherwise the port number.
+     *      -1 if disabled, 0 if random port is selected, otherwise the port number configured.
      */
-    public int getPort() {
+    public @CheckForSigned int getPort() {
         return port;
     }
 
     /**
      * Gets the current TCP/IP port that this daemon is running with.
      *
-     * @return -1 if disabled, but never null.
+     * @return Actual port number or -1 if disabled.
      */
-    public synchronized int getActualPort() {
+    public synchronized @CheckForSigned int getActualPort() {
         if (port==-1)   return -1;
         if (sshd!=null)
             return sshd.getPort();
         return port;
     }
 
+    /**
+     * Set the port number to be used.
+     *
+     * @param port -1 to disable this, 0 to run with a random port, otherwise the port number.
+     */
     public void setPort(int port) {
         if (this.port!=port) {
             this.port = port;
-            MasterComputer.threadPoolForRemoting.submit(new Runnable() {
+            Timer.get().submit(new Runnable() {
                 public void run() {
                     restart();
                 }
@@ -120,6 +128,7 @@ public class SSHD extends GlobalConfiguration {
     }
     
     public synchronized void start() throws IOException, InterruptedException {
+        int port = this.port; // Capture local copy to prevent race conditions. Setting port to -1 after the check would blow up later.
         if (port<0) return; // don't start it
 
         stop();
@@ -200,7 +209,17 @@ public class SSHD extends GlobalConfiguration {
 
     @Initializer(after= InitMilestone.JOB_LOADED,fatal=false)
     public static void init() throws IOException, InterruptedException {
-        get().start();
+        LOGGER.fine("Scheduling SSHD startup");
+        Timer.get().submit(new Runnable() {
+            @Override public void run() {
+                try {
+                    get().start();
+                    LOGGER.fine("SSHD started");
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Failed to start SSHD", e);
+                }
+            }
+        });
     }
 
     private static Logger MINA_LOGGER = Logger.getLogger("org.apache.sshd");
