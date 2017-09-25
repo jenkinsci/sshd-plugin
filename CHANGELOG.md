@@ -1,6 +1,13 @@
 Changelog
 ====
 
+#### 2.1
+
+Release Date: (September 25, 2017)
+
+* [#19](https://github.com/jenkinsci/sshd-module/pull/19) - Do not wait for `SSHD` to be fully up during Jenkins startup.
+* [#19](https://github.com/jenkinsci/sshd-module/pull/19) - Avoid race condition between `SSHD#start` and `SSHD#setPort`.
+
 #### 2.0
 
 Release Date: (July 05, 2017)
