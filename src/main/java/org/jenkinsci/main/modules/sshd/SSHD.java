@@ -19,7 +19,6 @@ import javax.inject.Inject;
 
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
-import jenkins.model.Jenkins.MasterComputer;
 import jenkins.util.ServerTcpPort;
 import jenkins.util.Timer;
 import net.sf.json.JSONObject;
@@ -130,6 +129,7 @@ public class SSHD extends GlobalConfiguration {
     public synchronized void start() throws IOException, InterruptedException {
         int port = this.port; // Capture local copy to prevent race conditions. Setting port to -1 after the check would blow up later.
         if (port<0) return; // don't start it
+        LOGGER.fine("starting SSHD");
 
         stop();
         sshd = SshServer.setUpDefaultServer();
@@ -209,17 +209,7 @@ public class SSHD extends GlobalConfiguration {
 
     @Initializer(after= InitMilestone.JOB_LOADED,fatal=false)
     public static void init() throws IOException, InterruptedException {
-        LOGGER.fine("Scheduling SSHD startup");
-        Timer.get().submit(new Runnable() {
-            @Override public void run() {
-                try {
-                    get().start();
-                    LOGGER.fine("SSHD started");
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Failed to start SSHD", e);
-                }
-            }
-        });
+        get().start();
     }
 
     private static Logger MINA_LOGGER = Logger.getLogger("org.apache.sshd");
