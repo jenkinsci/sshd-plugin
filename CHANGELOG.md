@@ -1,6 +1,13 @@
 Changelog
 ====
 
+#### 2.2
+
+Release Date: (Oct 13, 2017)
+
+* [#20](https://github.com/jenkinsci/sshd-module/pull/20) -
+Make SSHD startup synchronous (partially reverts changes in 2.1). 
+
 #### 2.1
 
 Release Date: (September 25, 2017)
