@@ -35,7 +35,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
         return authenticated;
     }
-    
+
     private boolean processAuthenticate(String username, PublicKey key) {
         LOGGER.fine("Authentication attempted from "+username+" with "+key);
         User u = User.get(username, false, Collections.emptyMap());
@@ -43,21 +43,21 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
             LOGGER.fine("No such user exists: "+username);
             return false;
         }
-    
+
         UserPropertyImpl sshKey = u.getProperty(UserPropertyImpl.class);
         if (sshKey==null) {
             LOGGER.fine("No SSH key registered for user: "+username);
             return false;
         }
-    
+
         String signature = signatureWriter.asString(key);
         if (!sshKey.isAuthorizedKey(signature)) {
             LOGGER.fine("Key signature didn't match for the user: "+username+" : " + signature);
             return false;
         }
-    
+
         return true;
     }
-    
+
     private static final Logger LOGGER = Logger.getLogger(PublicKeyAuthenticatorImpl.class.getName());
 }
