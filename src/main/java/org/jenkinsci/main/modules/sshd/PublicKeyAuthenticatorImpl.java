@@ -81,7 +81,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
     private static final Logger LOGGER = Logger.getLogger(PublicKeyAuthenticatorImpl.class.getName());
 
     public static class SSHUserDetails extends org.acegisecurity.userdetails.User {
-        /* protected */ SSHUserDetails(@Nonnull String username, @Nonnull Authentication auth) {
+        private SSHUserDetails(@Nonnull String username, @Nonnull Authentication auth) {
             super(
                     username, "",
                     // account validity booleans
