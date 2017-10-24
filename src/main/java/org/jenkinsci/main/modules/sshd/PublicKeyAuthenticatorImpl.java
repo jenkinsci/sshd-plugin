@@ -1,16 +1,20 @@
 package org.jenkinsci.main.modules.sshd;
 
 import hudson.model.User;
-import jenkins.model.Jenkins;
 import jenkins.security.SecurityListener;
+import org.acegisecurity.Authentication;
 import org.acegisecurity.userdetails.UserDetails;
+import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.security.PublicKey;
 import java.util.Collections;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -24,40 +28,66 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
     private final PublicKeySignatureWriter signatureWriter = new PublicKeySignatureWriter();
 
     public boolean authenticate(String username, PublicKey key, ServerSession session) {
-        boolean authenticated = this.processAuthenticate(username, key);
+        User user = this.retrieveOnlyKeyValidatedUser(username, key);
 
-        if(authenticated){
-            UserDetails userDetails = Jenkins.getInstance().getSecurityRealm().loadUserByUsername(username);
-            SecurityListener.fireAuthenticated(userDetails);
-        }else{
+        if (user == null) {
             SecurityListener.fireFailedToAuthenticate(username);
+            return false;
         }
 
-        return authenticated;
+        Authentication auth = this.verifyUserUsingSecurityRealm(user);
+        if (auth == null) {
+            SecurityListener.fireFailedToAuthenticate(username);
+            return false;
+        }
+
+        UserDetails userDetails = new SSHUserDetails(username, auth);
+        SecurityListener.fireAuthenticated(userDetails);
+        return true;
     }
 
-    private boolean processAuthenticate(String username, PublicKey key) {
-        LOGGER.fine("Authentication attempted from "+username+" with "+key);
+    private @CheckForNull User retrieveOnlyKeyValidatedUser(String username, PublicKey key) {
+        LOGGER.fine("Authentication attempted from " + username + " with " + key);
         User u = User.get(username, false, Collections.emptyMap());
-        if (u==null) {
-            LOGGER.fine("No such user exists: "+username);
-            return false;
+        if (u == null) {
+            LOGGER.fine("No such user exists: " + username);
+            return null;
         }
 
         UserPropertyImpl sshKey = u.getProperty(UserPropertyImpl.class);
-        if (sshKey==null) {
-            LOGGER.fine("No SSH key registered for user: "+username);
-            return false;
+        if (sshKey == null) {
+            LOGGER.fine("No SSH key registered for user: " + username);
+            return null;
         }
 
         String signature = signatureWriter.asString(key);
         if (!sshKey.isAuthorizedKey(signature)) {
-            LOGGER.fine("Key signature didn't match for the user: "+username+" : " + signature);
-            return false;
+            LOGGER.fine("Key signature didn't match for the user: " + username + " : " + signature);
+            return null;
         }
 
-        return true;
+        return u;
+    }
+
+    private @CheckForNull Authentication verifyUserUsingSecurityRealm(@Nonnull User user) {
+        try {
+            return user.impersonate();
+        } catch (UsernameNotFoundException e) {
+            LOGGER.log(Level.FINE, user.getId() + " is not a real user accordingly to SecurityRealm", e);
+            return null;
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(PublicKeyAuthenticatorImpl.class.getName());
+
+    public static class SSHUserDetails extends org.acegisecurity.userdetails.User {
+        /* protected */ SSHUserDetails(@Nonnull String username, @Nonnull Authentication auth) {
+            super(
+                    username, "",
+                    // account validity booleans
+                    true, true, true, true,
+                    auth.getAuthorities()
+            );
+        }
+    }
 }
