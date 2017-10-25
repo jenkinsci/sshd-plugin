@@ -13,7 +13,6 @@ import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.security.PublicKey;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +47,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
     private @CheckForNull User retrieveOnlyKeyValidatedUser(String username, PublicKey key) {
         LOGGER.log(Level.FINE, "Authentication attempted from {0} with {1}", new Object[]{ username, key });
-        User u = User.get(username, false, Collections.emptyMap());
+        User u = User.getById(username, false);
         if (u == null) {
             LOGGER.log(Level.FINE, "No such user exists: {0}", new Object[]{ username });
             return null;
@@ -62,7 +61,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
         String signature = signatureWriter.asString(key);
         if (!sshKey.isAuthorizedKey(signature)) {
-            LOGGER.log(Level.FINE,"Key signature didn't match for the user: {0} : {1}", new Object[]{ username, signature });
+            LOGGER.log(Level.FINE,"Key signature did not match for the user: {0} : {1}", new Object[]{ username, signature });
             return null;
         }
 
@@ -73,7 +72,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
         try {
             return user.impersonate();
         } catch (UsernameNotFoundException e) {
-            LOGGER.log(Level.FINE, user.getId() + " is not a real user accordingly to SecurityRealm", e);
+            LOGGER.log(Level.FINE, user.getId() + " is not a real user according to SecurityRealm", e);
             return null;
         }
     }
