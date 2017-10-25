@@ -47,22 +47,22 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
     }
 
     private @CheckForNull User retrieveOnlyKeyValidatedUser(String username, PublicKey key) {
-        LOGGER.fine("Authentication attempted from " + username + " with " + key);
+        LOGGER.log(Level.FINE, "Authentication attempted from {0} with {1}", new Object[]{ username, key });
         User u = User.get(username, false, Collections.emptyMap());
         if (u == null) {
-            LOGGER.fine("No such user exists: " + username);
+            LOGGER.log(Level.FINE, "No such user exists: {0}", new Object[]{ username });
             return null;
         }
 
         UserPropertyImpl sshKey = u.getProperty(UserPropertyImpl.class);
         if (sshKey == null) {
-            LOGGER.fine("No SSH key registered for user: " + username);
+            LOGGER.log(Level.FINE, "No SSH key registered for user: {0}", new Object[]{ username });
             return null;
         }
 
         String signature = signatureWriter.asString(key);
         if (!sshKey.isAuthorizedKey(signature)) {
-            LOGGER.fine("Key signature didn't match for the user: " + username + " : " + signature);
+            LOGGER.log(Level.FINE,"Key signature didn't match for the user: {0} : {1}", new Object[]{ username, signature });
             return null;
         }
 
@@ -80,7 +80,15 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
     private static final Logger LOGGER = Logger.getLogger(PublicKeyAuthenticatorImpl.class.getName());
 
-    public static class SSHUserDetails extends org.acegisecurity.userdetails.User {
+    /**
+     * UserDetails built from the authentication provided by {@link User#impersonate()}.
+     * It's not completely accurate since the internal UserDetails used in impersonate is not exposed at the moment
+     *
+     * TODO temporary solution since the User#getUserDetailsForImpersonation is not implemented
+     * https://github.com/jenkinsci/jenkins/pull/3074
+     * Will be removed in future version (with higher jenkins version dependency)
+     */
+    private static class SSHUserDetails extends org.acegisecurity.userdetails.User {
         private SSHUserDetails(@Nonnull String username, @Nonnull Authentication auth) {
             super(
                     username, "",
