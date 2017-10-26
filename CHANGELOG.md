@@ -1,6 +1,15 @@
 Changelog
 ====
 
+#### 2.3
+
+Release date: (Oct 27, 2017)
+
+* [JENKINS-27026](https://issues.jenkins-ci.org/browse/JENKINS-27026) - 
+Fire authentication events in [SecurityListener](https://jenkins.io/doc/developer/extensions/jenkins-core/#securitylistener)s when a user connects using SSH.
+* [PR #21](https://github.com/jenkinsci/sshd-module/pull/21) -
+Update Parent POM and resolve upper bound dependency issues.
+
 #### 2.2
 
 Release Date: (Oct 13, 2017)
