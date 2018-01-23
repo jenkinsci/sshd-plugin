@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>2.36</version>
+    <version>3.2</version>
     <relativePath />
   </parent>
 
@@ -28,7 +28,7 @@
   </licenses>
 
   <properties>
-    <jenkins.version>2.54</jenkins.version>
+    <jenkins.version>2.89.3</jenkins.version>
     <java.level>8</java.level>
   </properties>
 
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.apache.sshd</groupId>
       <artifactId>sshd-core</artifactId>
-      <version>1.6.0</version>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.modules</groupId>
