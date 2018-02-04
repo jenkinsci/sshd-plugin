@@ -1,6 +1,14 @@
 Changelog
 ====
 
+#### 2.4
+
+Release date: (Feb 04, 2018)
+
+* [PR #23](https://github.com/jenkinsci/sshd-module/pull/23) - 
+Update SSHD Core from 1.6.0 to 1.7.0
+([Full Changelog](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12341097&styleName=Text&projectId=12310849&Create=Create&atl_token=A5KQ-2QAV-T4JA-FDED%7C47f5fd1e799680219ff14477b5b2c29ce7aaf6fd%7Clin))
+
 #### 2.3
 
 Release date: (Oct 27, 2017)
