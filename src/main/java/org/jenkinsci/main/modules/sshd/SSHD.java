@@ -26,9 +26,14 @@ import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
+import org.apache.sshd.common.random.JceRandomFactory;
+import org.apache.sshd.common.random.SingletonRandomFactory;
+import org.apache.sshd.common.util.security.SecurityUtils;
+import org.apache.sshd.server.ServerBuilder;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
+import org.jenkinsci.main.modules.sshd.random.BouncyCastleNonBlockingRandomFactory;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -132,7 +137,11 @@ public class SSHD extends GlobalConfiguration {
         LOGGER.fine("starting SSHD");
 
         stop();
-        sshd = SshServer.setUpDefaultServer();
+        sshd = ServerBuilder.builder()
+                .randomFactory(new SingletonRandomFactory(SecurityUtils.isBouncyCastleRegistered()
+                        ? BouncyCastleNonBlockingRandomFactory.INSTANCE
+                        : JceRandomFactory.INSTANCE))
+                .build();
 
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
         
