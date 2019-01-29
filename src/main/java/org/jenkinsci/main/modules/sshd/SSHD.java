@@ -26,7 +26,6 @@ import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
-import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
@@ -154,24 +153,7 @@ public class SSHD extends GlobalConfiguration {
 
         // Allow to configure idle timeout with a system property
         String idleTimeoutPropertyName = SSHD.class.getName() + "." + IDLE_TIMEOUT_KEY;
-        String idleTimeout = System.getProperty(idleTimeoutPropertyName);
-        if (idleTimeout != null) {
-            try {
-                // In sshd-core 0.8.0 it must be an int
-                // https://github.com/apache/mina-sshd/blob/sshd-0.8.0/sshd-core/src/main/java/org/apache/sshd/server/session/ServerSession.java#L68
-                int idleTimeoutAsInt = Integer.parseInt(idleTimeout);
-                sshd.getProperties().put(ServerFactoryManager.IDLE_TIMEOUT, idleTimeoutAsInt);
-                // Read timeout must also be changed
-                long readTimeout = 0;
-                if (idleTimeoutAsInt != 0) {
-                    readTimeout = ServerFactoryManager.DEFAULT_NIO2_READ_TIMEOUT - ServerFactoryManager.DEFAULT_IDLE_TIMEOUT + idleTimeoutAsInt;
-                }
-                sshd.getProperties().put(ServerFactoryManager.NIO2_READ_TIMEOUT, readTimeout);
-            } catch (NumberFormatException nfe) {
-                LOGGER.warning("SSHD Idle Timeout configuration skipped. " + idleTimeoutPropertyName + " value (" +
-                        idleTimeout + ") isn't an integer.");
-            }
-        }
+        IdleTimeout.fromSystemProperty(idleTimeoutPropertyName).apply(sshd);
 
         sshd.start();
         LOGGER.info("Started SSHD at port " + sshd.getPort());
