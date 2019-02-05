@@ -1,6 +1,13 @@
 Changelog
 ====
 
+### 2.5
+
+Release date: (Nov 25, 2018)
+
+* [JENKINS-45318](https://issues.jenkins-ci.org/browse/JENKINS-45318) -
+Include the native EdDSA implementation into the module ([net.i2p.crypto:eddsa](https://github.com/str4d/ed25519-java)).
+
 #### 2.4
 
 Release date: (Feb 04, 2018)
