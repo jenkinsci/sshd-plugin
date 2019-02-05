@@ -5,9 +5,14 @@ import org.apache.sshd.server.SshServer;
 
 import java.util.logging.Logger;
 
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+
 /**
+ * Utility class which properly manages Apache MINA idle timeout, see JENKINS-55978 
  * @author Réda Housni Alaoui
  */
+@Restricted(NoExternalUse.class)
 public class IdleTimeout {
 
 	private static final Logger LOGGER = Logger.getLogger(IdleTimeout.class.getName());
