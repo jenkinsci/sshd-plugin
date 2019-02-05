@@ -1,6 +1,14 @@
 Changelog
 ====
 
+### 2.6
+
+Release date: (Feb 05, 2019)
+
+* [JENKINS-55978](https://issues.jenkins-ci.org/browse/JENKINS-55978) -
+SSHD Module did not apply a proper Apache Mina idle timeout value when a custom value was set by the 
+`org.jenkinsci.main.modules.sshd.SSHD.idle-timeout` system property
+
 ### 2.5
 
 Release date: (Nov 25, 2018)
