@@ -26,6 +26,7 @@ import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
+import org.apache.sshd.common.session.SessionContext;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
@@ -141,7 +142,7 @@ public class SSHD extends GlobalConfiguration {
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
             @Override
-            public Iterable<KeyPair> loadKeys() {
+            public Iterable<KeyPair> loadKeys(SessionContext sessionContext) {
                 return Collections.singletonList(new KeyPair(identity.getPublic(),identity.getPrivate()));
             }
         });

@@ -1,8 +1,8 @@
 package org.jenkinsci.main.modules.sshd;
 
-import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
+import org.apache.sshd.server.command.Command;
 
 import java.io.IOException;
 import java.io.InputStream;

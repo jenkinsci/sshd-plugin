@@ -3,8 +3,7 @@ package org.jenkinsci.main.modules.sshd;
 import hudson.Extension;
 import hudson.cli.CLICommand;
 import hudson.model.User;
-import jenkins.model.Jenkins;
-import org.apache.sshd.server.Command;
+import org.apache.sshd.server.command.Command;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;

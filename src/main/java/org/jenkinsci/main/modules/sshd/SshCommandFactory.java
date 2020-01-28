@@ -3,8 +3,7 @@ package org.jenkinsci.main.modules.sshd;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.util.QuotedStringTokenizer;
-import jenkins.model.Jenkins;
-import org.apache.sshd.server.Command;
+import org.apache.sshd.server.command.Command;
 
 import java.util.AbstractList;
 import java.util.Arrays;
