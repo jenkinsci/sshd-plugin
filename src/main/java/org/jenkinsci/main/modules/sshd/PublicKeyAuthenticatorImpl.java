@@ -10,8 +10,8 @@ import org.apache.sshd.server.session.ServerSession;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +26,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
     private final PublicKeySignatureWriter signatureWriter = new PublicKeySignatureWriter();
 
+    @Override
     public boolean authenticate(String username, PublicKey key, ServerSession session) {
         User user = this.retrieveOnlyKeyValidatedUser(username, key);
 
@@ -40,7 +41,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
             return false;
         }
 
-        UserDetails userDetails = new SSHUserDetails(username, auth);
+        UserDetails userDetails = user.getUserDetailsForImpersonation();
         SecurityListener.fireAuthenticated(userDetails);
         return true;
     }
@@ -68,7 +69,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
         return u;
     }
 
-    private @CheckForNull Authentication verifyUserUsingSecurityRealm(@Nonnull User user) {
+    private @CheckForNull Authentication verifyUserUsingSecurityRealm(@NonNull User user) {
         try {
             return user.impersonate();
         } catch (UsernameNotFoundException e) {
@@ -79,22 +80,4 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
     private static final Logger LOGGER = Logger.getLogger(PublicKeyAuthenticatorImpl.class.getName());
 
-    /**
-     * UserDetails built from the authentication provided by {@link User#impersonate()}.
-     * It's not completely accurate since the internal UserDetails used in impersonate is not exposed at the moment
-     *
-     * TODO temporary solution since the User#getUserDetailsForImpersonation is not implemented
-     * https://github.com/jenkinsci/jenkins/pull/3074
-     * Will be removed in future version (with higher jenkins version dependency)
-     */
-    private static class SSHUserDetails extends org.acegisecurity.userdetails.User {
-        private SSHUserDetails(@Nonnull String username, @Nonnull Authentication auth) {
-            super(
-                    username, "",
-                    // account validity booleans
-                    true, true, true, true,
-                    auth.getAuthorities()
-            );
-        }
-    }
 }
