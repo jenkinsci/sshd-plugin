@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.annotation.CheckForSigned;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
@@ -20,11 +21,14 @@ import javax.inject.Inject;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.util.ServerTcpPort;
+import jenkins.util.SystemProperties;
 import jenkins.util.Timer;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
+import org.apache.sshd.common.kex.KeyExchange;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
@@ -44,6 +48,12 @@ public class SSHD extends GlobalConfiguration {
     private static final List<NamedFactory<Cipher>> ENABLED_CIPHERS = Arrays.<NamedFactory<Cipher>>asList(
         BuiltinCiphers.aes128ctr, BuiltinCiphers.aes192ctr, BuiltinCiphers.aes256ctr
     );
+
+    /**
+     * Comma-separated string of key exchange names to disable. Defaults to a list of DH SHA1 key exchanges, gets its value from {@link SystemProperties}.
+     */
+    private static final String EXCLUDED_KEY_EXCHANGES = SystemProperties.getString(SSHD.class.getName() + ".excludedKeyExchanges",
+            "diffie-hellman-group-exchange-sha1, diffie-hellman-group14-sha1, diffie-hellman-group1-sha1");
     
     @Override
     public GlobalConfigurationCategory getCategory() {
@@ -125,7 +135,7 @@ public class SSHD extends GlobalConfiguration {
          }
         return activatedCiphers;
     }
-    
+
     public synchronized void start() throws IOException, InterruptedException {
         int port = this.port; // Capture local copy to prevent race conditions. Setting port to -1 after the check would blow up later.
         if (port<0) return; // don't start it
@@ -137,6 +147,7 @@ public class SSHD extends GlobalConfiguration {
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
         
         sshd.setCipherFactories(getActivatedCiphers());
+        sshd.setKeyExchangeFactories(filterKeyExchanges(sshd.getKeyExchangeFactories()));
         sshd.setPort(port);
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
@@ -158,7 +169,32 @@ public class SSHD extends GlobalConfiguration {
         sshd.start();
         LOGGER.info("Started SSHD at port " + sshd.getPort());
     }
-    
+
+    /**
+     * Filter key exchanges based on configuration from {@link #EXCLUDED_KEY_EXCHANGES}.
+     * @param keyExchangeFactories the full list of key exchange factories
+     * @return a filtered list of key exchange factories
+     */
+    private List<NamedFactory<KeyExchange>> filterKeyExchanges(List<NamedFactory<KeyExchange>> keyExchangeFactories) {
+        if (StringUtils.isBlank(EXCLUDED_KEY_EXCHANGES)) {
+            return keyExchangeFactories;
+        }
+
+        List<String> excludedNames = Arrays.stream(EXCLUDED_KEY_EXCHANGES.split(",")).filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+
+        List<NamedFactory<KeyExchange>> filtered = new ArrayList<>();
+        for (NamedFactory<KeyExchange> keyExchangeNamedFactory : keyExchangeFactories) {
+            final String name = keyExchangeNamedFactory.getName();
+            if (excludedNames.contains(name)) {
+                LOGGER.log(Level.CONFIG, "Excluding " + name);
+            } else {
+                LOGGER.log(Level.FINE, "Not excluding " + name);
+                filtered.add(keyExchangeNamedFactory);
+            }
+        }
+        return filtered;
+    }
+
     public synchronized void restart() {
         try {
             if (sshd!=null) {
