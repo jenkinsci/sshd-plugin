@@ -30,6 +30,7 @@ import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.kex.KeyExchange;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
+import org.apache.sshd.common.mac.Mac;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
@@ -54,7 +55,13 @@ public class SSHD extends GlobalConfiguration {
      */
     private static final String EXCLUDED_KEY_EXCHANGES = SystemProperties.getString(SSHD.class.getName() + ".excludedKeyExchanges",
             "diffie-hellman-group-exchange-sha1, diffie-hellman-group14-sha1, diffie-hellman-group1-sha1");
-    
+
+    /**
+     * Comma-separated string of key exchange names to disable. Defaults to a list of MD5 and truncated SHA-1 HMACs, gets its value from {@link SystemProperties}.
+     */
+    private static final String EXCLUDED_MACS = SystemProperties.getString(SSHD.class.getName() + ".excludedMacs",
+            "hmac-md5, hmac-md5-96, hmac-sha1-96");
+
     @Override
     public GlobalConfigurationCategory getCategory() {
         return GlobalConfigurationCategory.get(GlobalConfigurationCategory.Security.class);
@@ -148,6 +155,7 @@ public class SSHD extends GlobalConfiguration {
         
         sshd.setCipherFactories(getActivatedCiphers());
         sshd.setKeyExchangeFactories(filterKeyExchanges(sshd.getKeyExchangeFactories()));
+        sshd.setMacFactories(filterMacs(sshd.getMacFactories()));
         sshd.setPort(port);
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
@@ -168,6 +176,26 @@ public class SSHD extends GlobalConfiguration {
 
         sshd.start();
         LOGGER.info("Started SSHD at port " + sshd.getPort());
+    }
+
+    private List<NamedFactory<Mac>> filterMacs(List<NamedFactory<Mac>> macFactories) {
+        if (StringUtils.isBlank(EXCLUDED_MACS)) {
+            return macFactories;
+        }
+
+        List<String> excludedNames = Arrays.stream(EXCLUDED_MACS.split(",")).filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+
+        List<NamedFactory<Mac>> filtered = new ArrayList<>();
+        for (NamedFactory<Mac> macFactory : macFactories) {
+            final String name = macFactory.getName();
+            if (excludedNames.contains(name)) {
+                LOGGER.log(Level.CONFIG, "Excluding " + name);
+            } else {
+                LOGGER.log(Level.FINE, "Not excluding " + name);
+                filtered.add(macFactory);
+            }
+        }
+        return filtered;
     }
 
     /**

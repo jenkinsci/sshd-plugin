@@ -20,6 +20,10 @@ These are generally considered unsupported, i.e. may be removed at any time.
   By default, this disables SHA-1 based algorithms as they're no longer considered safe.
   Use an empty string to disable no algorithms.
   The names of supported, enabled, and disabled algorithms can be viewed using the https://www.jenkins.io/doc/book/system-administration/viewing-logs/[logger] `org.jenkinsci.main.modules.sshd.SSHD` during initialization on the level `FINE`.
+* `org.jenkinsci.main.modules.sshd.SSHD.excludedMacs` is a comma-separated string of HMAC algorithms to disable.
+  By default, this disables MD5 and truncated SHA-1 based algorithms as they're no longer considered safe.
+  Use an empty string to disable no algorithms.
+  The names of supported, enabled, and disabled algorithms can be viewed using the https://www.jenkins.io/doc/book/system-administration/viewing-logs/[logger] `org.jenkinsci.main.modules.sshd.SSHD` during initialization on the level `FINE`.
 
 == Changelog
 
