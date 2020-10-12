@@ -1,0 +1,30 @@
+= SSHD Module
+
+== About
+
+This component provides a built-in SSH server for Jenkins.
+It's an alternative interface for the https://www.jenkins.io/doc/book/managing/cli/[Jenkins CLI], and commands can be invoked this way using any SSH client.
+
+NOTE: This is unrelated to https://plugins.jenkins.io/ssh-slaves/[SSH Build Agents]. In that case, the agents are the servers, and the Jenkins controller is the client.
+
+== Configuration
+
+Enable the built-in SSH server in _Manage Jenkins » Configure Global Security_.
+
+=== Advanced Configuration
+
+https://www.jenkins.io/doc/book/managing/system-properties/[System properties] can be used to configure hidden options.
+These are generally considered unsupported, i.e. may be removed at any time.
+
+* `org.jenkinsci.main.modules.sshd.SSHD.excludedKeyExchanges` is a comma-separated string of key exchange algorithms to disable.
+  By default, this disables SHA-1 based algorithms as they're no longer considered safe.
+  Use an empty string to disable no algorithms.
+  The names of supported, enabled, and disabled algorithms can be viewed using the https://www.jenkins.io/doc/book/system-administration/viewing-logs/[logger] `org.jenkinsci.main.modules.sshd.SSHD` during initialization on the level `FINE`.
+* `org.jenkinsci.main.modules.sshd.SSHD.excludedMacs` is a comma-separated string of HMAC algorithms to disable.
+  By default, this disables MD5 and truncated SHA-1 based algorithms as they're no longer considered safe.
+  Use an empty string to disable no algorithms.
+  The names of supported, enabled, and disabled algorithms can be viewed using the https://www.jenkins.io/doc/book/system-administration/viewing-logs/[logger] `org.jenkinsci.main.modules.sshd.SSHD` during initialization on the level `FINE`.
+
+== Changelog
+
+See link:CHANGELOG.md[CHANGELOG.md].
