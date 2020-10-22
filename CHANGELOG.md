@@ -1,6 +1,13 @@
 Changelog
 ====
 
+### 2.7
+
+Release date: (Oct 12, 2020)
+
+* [PR #35](https://github.com/jenkinsci/sshd-module/pull/35) - Make key exchange and MAC algorithms configurable via system properties, disable known obsolete algorithms by default.
+* [PR #28](https://github.com/jenkinsci/sshd-module/pull/28), [PR #31](https://github.com/jenkinsci/sshd-module/pull/31), [PR #32](https://github.com/jenkinsci/sshd-module/pull/32) - Plugin modernization
+
 ### 2.6
 
 Release date: (Feb 05, 2019)
