@@ -1,8 +1,9 @@
 package org.jenkinsci.main.modules.sshd;
 
-import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
+import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,8 @@ public class InvalidCommand implements Command {
         this.callback = callback;
     }
 
-    public void start(Environment env) throws IOException {
+    @Override
+    public void start(ChannelSession channel, Environment env) throws IOException {
         //TODO: Consider switching to UTF-8
         err.write(("Unknown command: "+command+"\n").getBytes(Charset.defaultCharset()));
         err.flush(); // working around SSHD-154
@@ -45,6 +47,8 @@ public class InvalidCommand implements Command {
         callback.onExit(255,"Unknown command: "+command);
     }
 
-    public void destroy() {
+    @Override
+    public void destroy(ChannelSession channel) throws Exception {
+
     }
 }

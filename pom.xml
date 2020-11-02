@@ -35,11 +35,20 @@
     <java.level>8</java.level>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.sshd</groupId>
       <artifactId>sshd-core</artifactId>
-      <version>1.7.0</version>
+      <version>2.5.1</version>
     </dependency>
     <dependency>
   	  <groupId>net.i2p.crypto</groupId>

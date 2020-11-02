@@ -3,12 +3,13 @@ package org.jenkinsci.main.modules.sshd;
 import hudson.Extension;
 import hudson.cli.CLICommand;
 import hudson.model.User;
-import jenkins.model.Jenkins;
-import org.apache.sshd.server.Command;
-
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Locale;
+import org.apache.sshd.server.Environment;
+import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
 
 /**
  * {@link SshCommandFactory} that invokes {@link CLICommand}s.
@@ -24,6 +25,14 @@ public class CLICommandAdapter extends SshCommandFactory {
         if (c==null)        return null;    // no such command
 
         return new AsynchronousCommand(commandLine) {
+            @Override
+            public void start(ChannelSession channel, Environment env) throws IOException {
+            }
+
+            @Override
+            public void destroy(ChannelSession channel) throws Exception {
+            }
+
             @Override
             protected int run() throws Exception {
                 // run as the authenticated user if we've actually authenticated the user,
