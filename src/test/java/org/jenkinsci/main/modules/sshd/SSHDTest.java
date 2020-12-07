@@ -2,8 +2,12 @@ package org.jenkinsci.main.modules.sshd;
 
 import hudson.security.AbstractPasswordBasedSecurityRealm;
 import hudson.security.GroupDetails;
+import org.acegisecurity.AccountExpiredException;
 import org.acegisecurity.AuthenticationException;
+import org.acegisecurity.CredentialsExpiredException;
+import org.acegisecurity.DisabledException;
 import org.acegisecurity.GrantedAuthority;
+import org.acegisecurity.LockedException;
 import org.acegisecurity.userdetails.User;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -12,6 +16,7 @@ import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.common.SshException;
 import org.apache.sshd.common.cipher.Cipher;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
@@ -70,9 +75,9 @@ public class SSHDTest {
     @Test
     @Issue("JENKINS-55813")
     public void enabledUserShouldBeAuthorized() throws Exception {
-        j.jenkins.setSecurityRealm(new InvalidUserTypesRealm());
         hudson.model.User enabled = hudson.model.User.getOrCreateByIdOrFullName("enabled");
         KeyPair keyPair = generateKeys(enabled);
+        j.jenkins.setSecurityRealm(new InvalidUserTypesRealm());
         SSHD server = SSHD.get();
         server.setPort(0);
         server.start();
@@ -112,9 +117,9 @@ public class SSHDTest {
     }
 
     private void assertUserCannotLoginToSSH(String username) throws Exception {
-        j.jenkins.setSecurityRealm(new InvalidUserTypesRealm());
         hudson.model.User user = hudson.model.User.getOrCreateByIdOrFullName(username);
         KeyPair keyPair = generateKeys(user);
+        j.jenkins.setSecurityRealm(new InvalidUserTypesRealm());
 
         SSHD server = SSHD.get();
         server.setPort(0);
@@ -125,7 +130,7 @@ public class SSHDTest {
             ConnectFuture future = client.connect(username, new InetSocketAddress(server.getActualPort()));
             try (ClientSession session = future.verify(10, TimeUnit.SECONDS).getSession()) {
                 session.addPublicKeyIdentity(keyPair);
-                assertThrows(IOException.class, () -> session.auth().verify(10, TimeUnit.SECONDS));
+                assertThrows(SshException.class, () -> session.auth().verify(10, TimeUnit.SECONDS));
             }
         }
     }
@@ -150,8 +155,22 @@ public class SSHDTest {
 
         @Override
         public UserDetails loadUserByUsername(String user) throws UsernameNotFoundException, DataAccessException {
-            return new User(user, "", !user.equals("disabled"), !user.equals("expired"),
-                    !user.equals("password_expired"), !user.equals("locked"), new GrantedAuthority[0]);
+            switch (user) {
+                case "disabled":
+                    throw new DisabledException(user);
+
+                case "expired":
+                    throw new AccountExpiredException(user);
+
+                case "password_expired":
+                    throw new CredentialsExpiredException(user);
+
+                case "locked":
+                    throw new LockedException(user);
+
+                default:
+                    return new User(user, "", true, true, true, true, new GrantedAuthority[0]);
+            }
         }
 
         @Override

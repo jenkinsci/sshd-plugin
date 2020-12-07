@@ -2,6 +2,7 @@ package org.jenkinsci.main.modules.sshd;
 
 import hudson.model.User;
 import jenkins.security.SecurityListener;
+import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
@@ -33,13 +34,13 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
             return false;
         }
 
-        UserDetails userDetails = this.validateUserDetails(user);
+        UserDetails userDetails = this.verifyUserUsingSecurityRealm(user);
         if (userDetails == null) {
             SecurityListener.fireFailedToAuthenticate(username);
             return false;
         }
 
-        SecurityListener.fireAuthenticated(userDetails);
+        SecurityListener.fireAuthenticated(user.getUserDetailsForImpersonation());
         return true;
     }
 
@@ -66,26 +67,14 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
         return u;
     }
 
-    private @CheckForNull UserDetails validateUserDetails(@Nonnull User user) {
+    private @CheckForNull UserDetails verifyUserUsingSecurityRealm(@Nonnull User user) {
         try {
-            UserDetails userDetails = user.getUserDetailsForImpersonation();
-            if (!userDetails.isEnabled()) {
-                LOGGER.fine(() -> user.getId() + " account is disabled");
-                return null;
-            } else if (!userDetails.isAccountNonLocked()) {
-                LOGGER.fine(() -> user.getId() + " account is locked");
-                return null;
-            } else if (!userDetails.isAccountNonExpired()) {
-                LOGGER.fine(() -> user.getId() + " account is expired");
-                return null;
-            } else if (!userDetails.isCredentialsNonExpired()) {
-                LOGGER.fine(() -> user.getId() + " account credentials are expired");
-                return null;
-            } else {
-                return userDetails;
-            }
+            return user.getUserDetailsForImpersonation();
         } catch (UsernameNotFoundException e) {
             LOGGER.log(Level.FINE, e, () -> user.getId() + " is not a real user according to SecurityRealm");
+            return null;
+        } catch (AuthenticationException e) {
+            LOGGER.log(Level.FINE, e, () -> user.getId() + " is not available according to SecurityRealm");
             return null;
         }
     }
