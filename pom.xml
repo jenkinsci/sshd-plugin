@@ -7,7 +7,6 @@
     <relativePath />
   </parent>
 
-  <!-- change to generate incremental 0001 -->
   <groupId>org.jenkins-ci.modules</groupId> <!-- we use the modules groupId -->
   <artifactId>sshd</artifactId>
   <version>${revision}${changelist}</version>
