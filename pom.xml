@@ -7,7 +7,7 @@
     <relativePath />
   </parent>
 
-  <groupId>org.jenkins-ci.modules</groupId> <!-- we use the modules groupId -->
+  <groupId>org.jenkins-ci.modules</groupId> <!-- we use the modules groupId for historical reasons -->
   <artifactId>sshd</artifactId>
   <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
