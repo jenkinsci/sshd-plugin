@@ -1,5 +1,6 @@
 package org.jenkinsci.main.modules.sshd;
 
+import hudson.Functions;
 import hudson.security.AbstractPasswordBasedSecurityRealm;
 import hudson.security.GroupDetails;
 import org.acegisecurity.AccountExpiredException;
@@ -20,6 +21,7 @@ import org.apache.sshd.common.SshException;
 import org.apache.sshd.common.cipher.Cipher;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -38,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 /**
  * Tests of {@link SSHD}.
@@ -49,6 +52,11 @@ public class SSHDTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
+
+    @Before
+    public void setUp() {
+        assumeFalse(Functions.isWindows());
+    }
 
     /**
      * Makes sure 3 mode of the value round-trips correctly
