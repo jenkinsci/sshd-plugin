@@ -1,0 +1,10 @@
+__pycache__
+.DS_Store
+.pytest_cache
+.venv
+/**/jenkins/jenkins_home/jenkins.yaml
+jenkins-cli.jar
+jenkins/jenkins_home/plugins/sshd.jpi
+jenkins/war/jenkins.war
+junit-report.xml
+workflowLibs

@@ -1,0 +1,4 @@
+configuration-as-code
+git
+pipeline-model-definition
+workflow-cps-global-lib
