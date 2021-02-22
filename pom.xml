@@ -31,7 +31,7 @@
   <properties>
     <revision>3.0</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jenkins.version>2.265</jenkins.version> <!-- Current weekly -->
+    <jenkins.version>2.280</jenkins.version> <!-- Current weekly -->
     <java.level>8</java.level>
   </properties>
 
@@ -39,8 +39,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.249.x</artifactId>
-        <version>17</version>
+        <artifactId>bom-2.277.x</artifactId>
+        <version>25</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
