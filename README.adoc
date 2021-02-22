@@ -25,6 +25,12 @@ These are generally considered unsupported, i.e. may be removed at any time.
   Use an empty string to disable no algorithms.
   The names of supported, enabled, and disabled algorithms can be viewed using the https://www.jenkins.io/doc/book/system-administration/viewing-logs/[logger] `org.jenkinsci.main.modules.sshd.SSHD` during initialization on the level `FINE`.
 
-== Changelog
+# SSH CLI Client Authenticator for Jenkins (former ssh-cli-auth-module)
 
-See link:CHANGELOG.md[CHANGELOG.md].
+Defines the SSH public key user property and provides related API for Jenkins plugins.
+
+## Changelog
+
+See [GitHub Releases](https://github.com/jenkinsci/sshd-module/releases)
+
+for old releases see See link:CHANGELOG.md[CHANGELOG.md].
