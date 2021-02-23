@@ -62,7 +62,7 @@ dependencies:
 	# TODO change before merge and after https://github.com/jenkinsci/jenkins/pull/5049 and https://github.com/jenkinsci/sshd-module/pull/38
 	export JENKINS_URL="https://ci.jenkins.io/job/Core/job/jenkins/job/PR-5049/22/artifact/org/jenkins-ci/main/jenkins-war/2.270-rc30619.ae60983c246a/jenkins-war-2.270-rc30619.ae60983c246a.war"; \
 	curl -fsSL -o jenkins/war/jenkins.war $${JENKINS_URL};
-	export SSHD_MODULE_URL="https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/modules/sshd/3.0-rc166.9325e5d37325/sshd-3.0-rc166.9325e5d37325.hpi"; \
+	export SSHD_MODULE_URL="https://repo.jenkins-ci.org/releases/org/jenkins-ci/modules/sshd/3.0.1/sshd-3.0.1.hpi"; \
 	curl -fsSL -o jenkins/jenkins_home/plugins/sshd.jpi $${SSHD_MODULE_URL};
 	# cp ../../../target/sshd.jpi jenkins/jenkins_home/plugins/sshd.jpi
 
