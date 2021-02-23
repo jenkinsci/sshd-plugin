@@ -31,7 +31,7 @@
   <properties>
     <revision>3.1</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jenkins.version>2.280</jenkins.version> <!-- Current weekly -->
+    <jenkins.version>2.282-rc30905.2ddf35821c11</jenkins.version> <!-- Current weekly -->
     <java.level>8</java.level>
   </properties>
 
