@@ -2,7 +2,7 @@ package org.jenkinsci.main.modules.sshd;
 
 import hudson.model.User;
 import jenkins.security.SecurityListener;
-import org.acegisecurity.Authentication;
+import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
@@ -34,14 +34,13 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
             return false;
         }
 
-        Authentication auth = this.verifyUserUsingSecurityRealm(user);
-        if (auth == null) {
+        UserDetails userDetails = this.verifyUserUsingSecurityRealm(user);
+        if (userDetails == null) {
             SecurityListener.fireFailedToAuthenticate(username);
             return false;
         }
 
-        UserDetails userDetails = new SSHUserDetails(username, auth);
-        SecurityListener.fireAuthenticated(userDetails);
+        SecurityListener.fireAuthenticated(user.getUserDetailsForImpersonation());
         return true;
     }
 
@@ -68,33 +67,18 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
         return u;
     }
 
-    private @CheckForNull Authentication verifyUserUsingSecurityRealm(@Nonnull User user) {
+    private @CheckForNull UserDetails verifyUserUsingSecurityRealm(@Nonnull User user) {
         try {
-            return user.impersonate();
+            return user.getUserDetailsForImpersonation();
         } catch (UsernameNotFoundException e) {
-            LOGGER.log(Level.FINE, user.getId() + " is not a real user according to SecurityRealm", e);
+            LOGGER.log(Level.FINE, e, () -> user.getId() + " is not a real user according to SecurityRealm");
+            return null;
+        } catch (AuthenticationException e) {
+            LOGGER.log(Level.FINE, e, () -> user.getId() + " is not available according to SecurityRealm");
             return null;
         }
     }
 
     private static final Logger LOGGER = Logger.getLogger(PublicKeyAuthenticatorImpl.class.getName());
 
-    /**
-     * UserDetails built from the authentication provided by {@link User#impersonate()}.
-     * It's not completely accurate since the internal UserDetails used in impersonate is not exposed at the moment
-     *
-     * TODO temporary solution since the User#getUserDetailsForImpersonation is not implemented
-     * https://github.com/jenkinsci/jenkins/pull/3074
-     * Will be removed in future version (with higher jenkins version dependency)
-     */
-    private static class SSHUserDetails extends org.acegisecurity.userdetails.User {
-        private SSHUserDetails(@Nonnull String username, @Nonnull Authentication auth) {
-            super(
-                    username, "",
-                    // account validity booleans
-                    true, true, true, true,
-                    auth.getAuthorities()
-            );
-        }
-    }
 }

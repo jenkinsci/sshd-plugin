@@ -1,6 +1,13 @@
 Changelog
 ====
 
+### 3.0
+
+Release date: (Feb 22, 2021)
+
+* [JENKINS-55582](https://issues.jenkins.io/browse/JENKINS-55582) Turn modules into plugins
+* [JENKINS-55813](https://issues.jenkins.io/browse/JENKINS-55813) Ensure account status exceptions prevent successful SSH authentication
+
 ### 2.7
 
 Release date: (Oct 12, 2020)
