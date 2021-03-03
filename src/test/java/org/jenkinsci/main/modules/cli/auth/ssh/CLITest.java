@@ -25,7 +25,6 @@
 package org.jenkinsci.main.modules.cli.auth.ssh;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
-import com.google.common.collect.Lists;
 import hudson.Launcher;
 import hudson.Proc;
 import hudson.model.FreeStyleProject;
@@ -41,7 +40,6 @@ import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.sshd.common.util.io.ModifiableFileWatcher;
 import org.jenkinsci.main.modules.sshd.SSHD;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -72,7 +70,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -81,10 +78,9 @@ import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeThat;
 import static org.junit.Assume.assumeTrue;
 
-//TODO: Replace by the PCT run
 /**
  * Tests CLI operation with the SSH module.
- * These tests are a copy of the Jenkins tests from https://github.com/jenkinsci/jenkins/blob/master/test/src/test/java/hudson/cli/CLITest.java
+ * Extracted from https://github.com/jenkinsci/jenkins/blob/e681b4ff928435a500dcfb372cc9fc15b1c94413/test/src/test/java/hudson/cli/CLITest.java
  */
 public class CLITest {
 
@@ -165,14 +161,8 @@ public class CLITest {
         User.get("admin").addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"))));
         FreeStyleProject p = r.createFreeStyleProject("p");
         p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(5)));
-        doInterrupt(p, "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath());
-        doInterrupt(p, "-http", "-auth", "admin:admin");
-    }
-    private void doInterrupt(FreeStyleProject p, String... modeArgs) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        List<String> args = Lists.newArrayList("java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString());
-        args.addAll(Arrays.asList(modeArgs));
-        args.addAll(Arrays.asList("build", "-s", "-v", "p"));
+        List<String> args = Arrays.asList("java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "build", "-s", "-v", "p");
         Proc proc = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(args).stdout(new TeeOutputStream(baos, System.out)).stderr(System.err).start();
         while (!baos.toString().contains("Sleeping ")) {
             if (!proc.isAlive()) {
@@ -191,16 +181,13 @@ public class CLITest {
         grabCliJar();
 
         String url = r.getURL().toExternalForm() + "not-jenkins/";
-        for (String transport : Arrays.asList("-http", "-ssh")) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int ret = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
+                "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", url, "-ssh", "-user", "asdf", "who-am-i"
+        ).stdout(baos).stderr(baos).join();
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int ret = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
-                    "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", url, transport, "-user", "asdf", "who-am-i"
-            ).stdout(baos).stderr(baos).join();
-
-            assertThat(baos.toString(), containsString("There's no Jenkins running at"));
-            assertNotEquals(0, ret);
-        }
+        assertThat(baos.toString(), containsString("There's no Jenkins running at"));
+        assertNotEquals(0, ret);
     }
     @TestExtension("reportNotJenkins")
     public static final class NoJenkinsAction extends CrumbExclusion implements UnprotectedRootAction, StaplerProxy {
@@ -254,42 +241,15 @@ public class CLITest {
         assertEquals(rsp.getContentAsString(), null, rsp.getResponseHeaderValue("X-Jenkins-CLI-Port"));
         assertEquals(rsp.getContentAsString(), null, rsp.getResponseHeaderValue("X-SSH-Endpoint"));
 
-        for (String transport: Arrays.asList("-http", "-ssh")) {
+        String url = r.getURL().toString() + "cli-proxy/";
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int ret = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
+                "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", url, "-ssh", "-user", "asdf", "who-am-i"
+        ).stdout(baos).stderr(baos).join();
 
-            String url = r.getURL().toString() + "cli-proxy/";
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int ret = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
-                    "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", url, transport, "-user", "asdf", "who-am-i"
-            ).stdout(baos).stderr(baos).join();
-
-            //assertThat(baos.toString(), containsString("There's no Jenkins running at"));
-            assertThat(baos.toString(), containsString("Authenticated as: anonymous"));
-            assertEquals(0, ret);
-        }
-    }
-
-    @Ignore("TODO sometimes fails, in CI & locally")
-    @Test
-    @Issue("JENKINS-54310")
-    public void readInputAtOnce() throws Exception {
-        home = tempHome();
-        grabCliJar();
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
-            int ret = new Launcher.LocalLauncher(StreamTaskListener.fromStderr())
-                    .launch()
-                    .cmds("java",
-                            "-Duser.home=" + home,
-                            "-jar", jar.getAbsolutePath(),
-                            "-s", r.getURL().toString(),
-                            "list-plugins") // This CLI Command needs -auth option, so when we omit it, the CLI stops before reading the input.
-                    .stdout(baos)
-                    .stderr(baos)
-                    .stdin(CLITest.class.getResourceAsStream("huge-stdin.txt"))
-                    .join();
-            assertThat(baos.toString(), not(containsString("java.io.IOException: Stream is closed")));
-            assertEquals(0, ret);
-        }
+        //assertThat(baos.toString(), containsString("There's no Jenkins running at"));
+        assertThat(baos.toString(), containsString("Authenticated as: anonymous"));
+        assertEquals(0, ret);
     }
 
     @TestExtension("redirectToEndpointShouldBeFollowed")
