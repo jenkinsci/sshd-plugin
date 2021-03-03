@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
-public class TheTest {
+public class UserPropertyImplTest {
 
     @Rule public JenkinsRule r = new JenkinsRule();
 
@@ -29,7 +29,6 @@ public class TheTest {
         foo.addProperty(new UserPropertyImpl(publicKey));
         r.configRoundtrip(foo);
         assertEquals(publicKey, foo.getProperty(UserPropertyImpl.class).authorizedKeys);
-        // integration testing w/ sshd-module is in hudson.cli.CLITest.strictHostKey in core
     }
 
     @Issue("JENKINS-16337")
