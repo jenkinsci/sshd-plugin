@@ -47,7 +47,6 @@
     </dependencies>
   </dependencyManagement>
 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.sshd</groupId>
