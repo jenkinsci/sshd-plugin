@@ -193,7 +193,7 @@ public class CLITest {
         User.getById("admin", true).addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource(
                 "id_rsa.pub"),UTF_8)));
         FreeStyleProject p = r.createFreeStyleProject("p");
-        p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(5)));
+        p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(2)));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         List<String> args = Arrays.asList(
                 "java",
