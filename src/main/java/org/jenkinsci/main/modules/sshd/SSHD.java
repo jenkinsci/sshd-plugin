@@ -35,6 +35,7 @@ import org.apache.sshd.common.mac.Mac;
 import org.apache.sshd.common.session.SessionContext;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuthFactory;
+import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -158,29 +159,11 @@ public class SSHD extends GlobalConfiguration {
         sshd.setKeyExchangeFactories(filterKeyExchanges(sshd.getKeyExchangeFactories()));
         sshd.setMacFactories(filterMacs(sshd.getMacFactories()));
         sshd.setPort(port);
+        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
             @Override
-            public KeyPair loadKey(SessionContext session, String type) throws IOException, GeneralSecurityException {
-                return getKeyPairs().stream()
-                                    .filter(keyPair -> keyPair.getPrivate().getAlgorithm().equalsIgnoreCase(type))
-                                    .findFirst()
-                                    .get();
-            }
-
-            @Override
-            public Iterable<String> getKeyTypes(SessionContext session) throws IOException, GeneralSecurityException {
-                return getKeyPairs().stream()
-                                    .map(keyPair -> keyPair.getPrivate().getAlgorithm())
-                                    .collect(Collectors.toList());
-            }
-
-            @Override
             public Iterable<KeyPair> loadKeys(SessionContext session) throws IOException, GeneralSecurityException {
-                return getKeyPairs();
-            }
-
-            private List<KeyPair> getKeyPairs() {
                 return Collections.singletonList(new KeyPair(identity.getPublic(), identity.getPrivate()));
             }
         });
