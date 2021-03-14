@@ -31,7 +31,6 @@ import hudson.model.FreeStyleProject;
 import hudson.model.UnprotectedRootAction;
 import hudson.model.User;
 import hudson.security.csrf.CrumbExclusion;
-import hudson.util.HttpResponses;
 import hudson.util.StreamTaskListener;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
@@ -196,7 +195,16 @@ public class CLITest {
         FreeStyleProject p = r.createFreeStyleProject("p");
         p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(5)));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        List<String> args = Arrays.asList("java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "build", "-s", "-v", "p");
+        List<String> args = Arrays.asList(
+                "java",
+                "-Duser.home=" + home,
+                "-jar", jar.getAbsolutePath(),
+                "-s", r.getURL().toString(),
+                "-ssh",
+                "-user", "admin",
+                "-i", privkey.getAbsolutePath(),
+                "build", "-s", "-v", "p"
+        );
         Proc proc = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(args).stdout(new TeeOutputStream(baos, System.out)).stderr(System.err).start();
         while (!baos.toString().contains("Sleeping ")) {
             if (!proc.isAlive()) {
