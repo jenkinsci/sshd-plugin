@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Locale;
-git chimport org.apache.sshd.server.command.Command;
+import org.apache.sshd.server.command.Command;
 
 /**
  * {@link SshCommandFactory} that invokes {@link CLICommand}s.
