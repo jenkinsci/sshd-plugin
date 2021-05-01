@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Locale;
-import org.apache.sshd.server.Environment;
-import org.apache.sshd.server.ExitCallback;
-import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.Command;
 
 /**
@@ -31,6 +28,11 @@ public class CLICommandAdapter extends SshCommandFactory {
 
             @Override
             protected int run() throws IOException {
+                User u = getCurrentUser();
+                if (u!=null){
+                    c.setTransportAuth(u.impersonate());
+                }
+
                 CommandLine cmds = getCmdLine();
 
                 //TODO: Consider switching to UTF-8
