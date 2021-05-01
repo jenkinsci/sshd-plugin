@@ -2,6 +2,7 @@ package org.jenkinsci.main.modules.sshd;
 
 import hudson.Extension;
 import hudson.cli.CLICommand;
+import hudson.model.User;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -26,6 +27,11 @@ public class CLICommandAdapter extends SshCommandFactory {
         return new AsynchronousCommand(commandLine) {
             @Override
             public int runInt() throws IOException {
+                User u = getCurrentUser();
+                if (u!=null){
+                    c.setTransportAuth(u.impersonate());
+                }
+
                 CommandLine cmds = getCmdLine();
 
                 //TODO: Consider switching to UTF-8
