@@ -4,6 +4,7 @@ import hudson.model.User;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
 import org.acegisecurity.context.SecurityContextHolder;
+import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
@@ -95,6 +96,18 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
         return environment;
     }
 
+    public void start(ChannelSession channel, Environment env) throws IOException {
+        start(env);
+        //wait for the thread to end to keep the channel open.
+        while (thread.isAlive()){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                destroy();
+            }
+        }
+    }
+
     public void start(Environment env) throws IOException {
         this.environment = env;
         thread = new Thread(new Runnable() {
@@ -132,6 +145,11 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
     }
 
     protected abstract int run() throws Exception;
+
+    @Override
+    public void destroy(ChannelSession channel) throws Exception {
+        destroy();
+    }
 
     public void destroy() {
         if (thread!=null)
