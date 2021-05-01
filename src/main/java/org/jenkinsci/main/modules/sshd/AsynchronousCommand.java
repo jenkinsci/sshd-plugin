@@ -138,6 +138,11 @@ public abstract class AsynchronousCommand implements Command, SessionAware, Runn
         }
     }
 
+    @Override
+    public void destroy(ChannelSession channel) throws Exception {
+        destroy();
+    }
+
     public void destroy() {
         Thread.currentThread().interrupt();
     }

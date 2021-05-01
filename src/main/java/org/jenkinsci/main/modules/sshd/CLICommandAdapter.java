@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Locale;
-import org.apache.sshd.server.channel.ChannelSession;
-import org.apache.sshd.server.command.Command;
+git chimport org.apache.sshd.server.command.Command;
 
 /**
  * {@link SshCommandFactory} that invokes {@link CLICommand}s.
@@ -33,10 +32,6 @@ public class CLICommandAdapter extends SshCommandFactory {
                 return c.main(cmds.subList(1,cmds.size()), Locale.getDefault(), getInputStream(),
                               new PrintStream(getOutputStream(), false, Charset.defaultCharset().toString()),
                               new PrintStream(getErrorStream(), false, Charset.defaultCharset().toString()));
-            }
-
-            @Override
-            public void destroy(ChannelSession channel) throws Exception {
             }
         };
     }
