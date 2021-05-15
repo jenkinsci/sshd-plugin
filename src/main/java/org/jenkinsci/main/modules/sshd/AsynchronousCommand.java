@@ -120,7 +120,7 @@ public abstract class AsynchronousCommand implements Command, SessionAware, Runn
                 ACL.impersonate(user.impersonate());
 
             try {
-                i = AsynchronousCommand.this.runInt();
+                i = AsynchronousCommand.this.runCommand();
             } finally {
                 out.flush(); // working around SSHD-154
                 err.flush();
