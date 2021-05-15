@@ -26,7 +26,7 @@ public class CLICommandAdapter extends SshCommandFactory {
 
         return new AsynchronousCommand(commandLine) {
             @Override
-            public int runInt() throws IOException {
+            public int runCommand() throws IOException {
                 User u = getCurrentUser();
                 if (u!=null){
                     c.setTransportAuth(u.impersonate());

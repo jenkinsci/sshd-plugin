@@ -107,7 +107,7 @@ public abstract class AsynchronousCommand implements Command, SessionAware, Runn
         thread.start();
     }
 
-    protected abstract int runInt() throws Exception;
+    protected abstract int runCommand() throws Exception;
 
     public void run() {
         try {
