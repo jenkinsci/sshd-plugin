@@ -1,6 +1,5 @@
 package org.jenkinsci.main.modules.sshd;
 
-import io.jenkins.cli.shaded.org.apache.sshd.client.ClientFactoryManager;
 import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.SshServer;
@@ -12,7 +11,7 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
- * Utility class which properly manages Apache MINA idle timeout, see JENKINS-55978 
+ * Utility class which properly manages Apache MINA idle timeout, see JENKINS-55978
  * @author Réda Housni Alaoui
  */
 @Restricted(NoExternalUse.class)

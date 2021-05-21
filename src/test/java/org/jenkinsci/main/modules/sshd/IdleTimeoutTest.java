@@ -1,7 +1,6 @@
 package org.jenkinsci.main.modules.sshd;
 
 
-import io.jenkins.cli.shaded.org.apache.sshd.client.ClientFactoryManager;
 import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.SshServer;

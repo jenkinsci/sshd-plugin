@@ -20,24 +20,20 @@ public class CLICommandAdapter extends SshCommandFactory {
     public Command create(CommandLine commandLine) {
         String cmd = commandLine.get(0);
         final CLICommand c = CLICommand.clone(cmd);
-        if (c == null) {
-            return null;    // no such command
-        }
+        if (c==null)        return null;    // no such command
 
         return new AsynchronousCommand(commandLine) {
             @Override
             public int runCommand() throws IOException {
                 User u = getCurrentUser();
-                if (u!=null){
-                    c.setTransportAuth(u.impersonate());
-                }
+                if (u!=null)    c.setTransportAuth(u.impersonate());
 
                 CommandLine cmds = getCmdLine();
 
                 //TODO: Consider switching to UTF-8
                 return c.main(cmds.subList(1,cmds.size()), Locale.getDefault(), getInputStream(),
-                              new PrintStream(getOutputStream(), false, Charset.defaultCharset().toString()),
-                              new PrintStream(getErrorStream(), false, Charset.defaultCharset().toString()));
+                        new PrintStream(getOutputStream(), false, Charset.defaultCharset().toString()),
+                        new PrintStream(getErrorStream(), false, Charset.defaultCharset().toString()));
             }
         };
     }

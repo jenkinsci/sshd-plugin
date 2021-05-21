@@ -129,47 +129,19 @@ public class CLITest {
         r.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy().grant(Jenkins.ADMINISTER).everywhere().to("admin"));
         SSHD.get().setPort(0);
         File privkey = tmp.newFile("id_rsa");
-        String keyPath = privkey.getAbsolutePath();
         FileUtils.copyURLToFile(CLITest.class.getResource("id_rsa"), privkey);
-        User.getById("admin", true).addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource(
-                "id_rsa.pub"), UTF_8)));
-
-        assertNotEquals(0, localLauncher.launch().cmds(
-                "java",
-                    "-Duser.home=" + home,
-                    "-jar", sshCliJar,
-                    "-s", jenkinsUrl,
-                    "-ssh",
-                    "-user", "admin",
-                    "-i", keyPath,
-                    "-strictHostKey",
-                    "-logger", "FINE",
-                    "who-am-i"
+        User.get("admin").addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"))));
+        assertNotEquals(0, new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
+            "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "-strictHostKey", "who-am-i"
         ).stdout(System.out).stderr(System.err).join());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        assertEquals(0, localLauncher.launch().cmds(
-                "java",
-                    "-Duser.home=" + home,
-                    "-jar", sshCliJar,
-                    "-s", jenkinsUrl,
-                    "-ssh",
-                    "-user", "admin",
-                    "-i", keyPath,
-                    "-logger", "FINE",
-                    "who-am-i"
+        assertEquals(0, new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
+            "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "-logger", "FINEST",  "who-am-i"
         ).stdout(baos).stderr(System.err).join());
         assertThat(baos.toString(), containsString("Authenticated as: admin"));
         baos = new ByteArrayOutputStream();
-        assertEquals(0, localLauncher.launch().cmds(
-                "java",
-                    "-Duser.home=" + home,
-                    "-jar", sshCliJar,
-                    "-s", jenkinsUrl./* just checking */replaceFirst("/$", ""),
-                    "-ssh",
-                    "-user", "admin",
-                    "-i", keyPath,
-                    "-strictHostKey",
-                    "who-am-i"
+        assertEquals(0, new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
+            "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString()./* just checking */replaceFirst("/$", ""), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "-strictHostKey", "who-am-i"
         ).stdout(baos).stderr(System.err).join());
         assertThat(baos.toString(), containsString("Authenticated as: admin"));
     }
@@ -190,21 +162,11 @@ public class CLITest {
         SSHD.get().setPort(0);
         File privkey = tmp.newFile("id_rsa");
         FileUtils.copyURLToFile(CLITest.class.getResource("id_rsa"), privkey);
-        User.getById("admin", true).addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource(
-                "id_rsa.pub"),UTF_8)));
+        User.get("admin").addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"))));
         FreeStyleProject p = r.createFreeStyleProject("p");
-        p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(2)));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        List<String> args = Arrays.asList(
-                "java",
-                "-Duser.home=" + home,
-                "-jar", jar.getAbsolutePath(),
-                "-s", r.getURL().toString(),
-                "-ssh",
-                "-user", "admin",
-                "-i", privkey.getAbsolutePath(),
-                "build", "-s", "-v", "p"
-        );
+        p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(2)));
+        List<String> args = Arrays.asList("java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "build", "-s", "-v", "p");
         Proc proc = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(args).stdout(new TeeOutputStream(baos, System.out)).stderr(System.err).start();
         while (!baos.toString().contains("Sleeping ")) {
             if (!proc.isAlive()) {
