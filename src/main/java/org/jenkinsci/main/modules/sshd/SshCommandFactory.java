@@ -3,12 +3,11 @@ package org.jenkinsci.main.modules.sshd;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.util.QuotedStringTokenizer;
-import jenkins.model.Jenkins;
-import org.apache.sshd.server.Command;
 
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.sshd.server.command.Command;
 
 /**
  * Extension point for adding commands invokable via SSH.

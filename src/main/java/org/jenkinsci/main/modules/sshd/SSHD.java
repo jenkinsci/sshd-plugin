@@ -5,6 +5,7 @@ import hudson.ExtensionList;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +29,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
-import org.apache.sshd.common.kex.KeyExchange;
+import org.apache.sshd.common.kex.KeyExchangeFactory;
 import org.apache.sshd.common.keyprovider.AbstractKeyPairProvider;
 import org.apache.sshd.common.mac.Mac;
+import org.apache.sshd.common.session.SessionContext;
 import org.apache.sshd.server.SshServer;
-import org.apache.sshd.server.auth.UserAuth;
+import org.apache.sshd.server.auth.UserAuthFactory;
+import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -150,18 +153,18 @@ public class SSHD extends GlobalConfiguration {
 
         stop();
         sshd = SshServer.setUpDefaultServer();
-
-        sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthNamedFactory()));
+        sshd.setUserAuthFactories(Arrays.<UserAuthFactory>asList(new UserAuthNamedFactory()));
         
         sshd.setCipherFactories(getActivatedCiphers());
         sshd.setKeyExchangeFactories(filterKeyExchanges(sshd.getKeyExchangeFactories()));
         sshd.setMacFactories(filterMacs(sshd.getMacFactories()));
         sshd.setPort(port);
+        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
             @Override
-            public Iterable<KeyPair> loadKeys() {
-                return Collections.singletonList(new KeyPair(identity.getPublic(),identity.getPrivate()));
+            public Iterable<KeyPair> loadKeys(SessionContext session) throws IOException, GeneralSecurityException {
+                return Collections.singletonList(new KeyPair(identity.getPublic(), identity.getPrivate()));
             }
         });
 
@@ -203,15 +206,15 @@ public class SSHD extends GlobalConfiguration {
      * @param keyExchangeFactories the full list of key exchange factories
      * @return a filtered list of key exchange factories
      */
-    private List<NamedFactory<KeyExchange>> filterKeyExchanges(List<NamedFactory<KeyExchange>> keyExchangeFactories) {
+    private List<KeyExchangeFactory> filterKeyExchanges(List<KeyExchangeFactory> keyExchangeFactories) {
         if (StringUtils.isBlank(EXCLUDED_KEY_EXCHANGES)) {
             return keyExchangeFactories;
         }
 
         List<String> excludedNames = Arrays.stream(EXCLUDED_KEY_EXCHANGES.split(",")).filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
 
-        List<NamedFactory<KeyExchange>> filtered = new ArrayList<>();
-        for (NamedFactory<KeyExchange> keyExchangeNamedFactory : keyExchangeFactories) {
+        List<KeyExchangeFactory> filtered = new ArrayList<>();
+        for (KeyExchangeFactory keyExchangeNamedFactory : keyExchangeFactories) {
             final String name = keyExchangeNamedFactory.getName();
             if (excludedNames.contains(name)) {
                 LOGGER.log(Level.CONFIG, "Excluding " + name);

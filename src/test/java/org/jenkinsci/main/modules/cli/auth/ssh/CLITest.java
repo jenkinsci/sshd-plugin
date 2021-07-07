@@ -34,9 +34,9 @@ import hudson.security.csrf.CrumbExclusion;
 import hudson.util.StreamTaskListener;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
-import org.apache.commons.io.FileUtils;
+import io.jenkins.cli.shaded.org.apache.commons.io.FileUtils;
+import io.jenkins.cli.shaded.org.apache.commons.io.output.TeeOutputStream;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.sshd.common.util.io.ModifiableFileWatcher;
 import org.jenkinsci.main.modules.sshd.SSHD;
 import org.junit.ClassRule;
@@ -49,7 +49,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockAuthorizationStrategy;
 import org.jvnet.hudson.test.SleepBuilder;
 import org.jvnet.hudson.test.TestExtension;
-import org.kohsuke.stapler.HttpResponses;
+import org.kohsuke.stapler.HttpResponses.HttpResponseException;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
@@ -69,11 +69,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeThat;
 import static org.junit.Assume.assumeTrue;
@@ -118,8 +119,11 @@ public class CLITest {
     @Issue("JENKINS-41745")
     @Test
     public void strictHostKey() throws Exception {
+        Launcher.LocalLauncher localLauncher = new Launcher.LocalLauncher(StreamTaskListener.fromStderr());
+        String jenkinsUrl = r.getURL().toString();
         home = tempHome();
         grabCliJar();
+        String sshCliJar = jar.getAbsolutePath();
 
         r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
         r.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy().grant(Jenkins.ADMINISTER).everywhere().to("admin"));
@@ -160,8 +164,8 @@ public class CLITest {
         FileUtils.copyURLToFile(CLITest.class.getResource("id_rsa"), privkey);
         User.get("admin").addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"))));
         FreeStyleProject p = r.createFreeStyleProject("p");
-        p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(5)));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(2)));
         List<String> args = Arrays.asList("java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "build", "-s", "-v", "p");
         Proc proc = new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(args).stdout(new TeeOutputStream(baos, System.out)).stderr(System.err).start();
         while (!baos.toString().contains("Sleeping ")) {
@@ -271,10 +275,10 @@ public class CLITest {
             throw doDynamic(Stapler.getCurrentRequest(), Stapler.getCurrentResponse());
         }
 
-        public HttpResponses.HttpResponseException doDynamic(StaplerRequest req, StaplerResponse rsp) {
+        public HttpResponseException doDynamic(StaplerRequest req, StaplerResponse rsp) {
             final String url = req.getRequestURIWithQueryString().replaceFirst("/cli-proxy", "");
             // Custom written redirect so no traces of Jenkins are present in headers
-            return new HttpResponses.HttpResponseException() {
+            return new HttpResponseException() {
                 @Override
                 public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
                     rsp.setHeader("Location", url);

@@ -4,7 +4,8 @@ import hudson.model.User;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
 import org.acegisecurity.context.SecurityContextHolder;
-import org.apache.sshd.server.Command;
+import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.SessionAware;
@@ -27,7 +28,7 @@ import javax.annotation.CheckForNull;
  *
  * @author Kohsuke Kawaguchi
  */
-public abstract class AsynchronousCommand implements Command, SessionAware {
+public abstract class AsynchronousCommand implements Command, SessionAware, Runnable {
     private InputStream in;
     private OutputStream out;
     private OutputStream err;
@@ -95,46 +96,54 @@ public abstract class AsynchronousCommand implements Command, SessionAware {
         return environment;
     }
 
+    public void start(ChannelSession channel, Environment env) throws IOException {
+        start(env);
+    }
+
     public void start(Environment env) throws IOException {
         this.environment = env;
-        thread = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    int i;
-
-                    // run the command in the context of the authenticated user
-                    SecurityContext old = SecurityContextHolder.getContext();
-                    User user = getCurrentUser();
-                    if (user!=null)
-                        ACL.impersonate(user.impersonate());
-
-                    try {
-                        i = AsynchronousCommand.this.run();
-                    } finally {
-                        out.flush(); // working around SSHD-154
-                        err.flush();
-                        SecurityContextHolder.setContext(old);
-                    }
-                    callback.onExit(i);
-                } catch (Exception e) {
-                    // report the cause of the death to the client
-                    //TODO: Consider switching to UTF-8
-                    PrintWriter ps = new PrintWriter(new OutputStreamWriter(err, Charset.defaultCharset()));
-                    e.printStackTrace(ps);
-                    ps.flush();
-
-                    callback.onExit(255,e.getMessage());
-                }
-            }
-        });
+        thread = new Thread(this);
         thread.setName("SSH command: " + cmdLine.getSingleLine());
         thread.start();
     }
 
-    protected abstract int run() throws Exception;
+    protected abstract int runCommand() throws Exception;
+
+    public void run() {
+        try {
+            int i;
+
+            // run the command in the context of the authenticated user
+            SecurityContext old = SecurityContextHolder.getContext();
+            User user = getCurrentUser();
+            if (user!=null)
+                ACL.impersonate(user.impersonate());
+
+            try {
+                i = AsynchronousCommand.this.runCommand();
+            } finally {
+                out.flush(); // working around SSHD-154
+                err.flush();
+                SecurityContextHolder.setContext(old);
+            }
+            callback.onExit(i);
+        } catch (Exception e) {
+            // report the cause of the death to the client
+            //TODO: Consider switching to UTF-8
+            PrintWriter ps = new PrintWriter(new OutputStreamWriter(err, Charset.defaultCharset()));
+            e.printStackTrace(ps);
+            ps.flush();
+
+            callback.onExit(255,e.getMessage());
+        }
+    }
+
+    @Override
+    public void destroy(ChannelSession channel) throws Exception {
+        destroy();
+    }
 
     public void destroy() {
-        if (thread!=null)
-            thread.interrupt();
+        Thread.currentThread().interrupt();
     }
 }

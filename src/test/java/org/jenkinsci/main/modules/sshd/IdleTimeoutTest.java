@@ -35,15 +35,16 @@ public class IdleTimeoutTest {
 
 	@Test
 	public void apply24HoursTimeout() {
-		IdleTimeout idleTimeout = new IdleTimeout(TimeUnit.HOURS.toMillis(24));
+		long timeoutInMilliseconds = TimeUnit.HOURS.toMillis(24);
+		IdleTimeout idleTimeout = new IdleTimeout(timeoutInMilliseconds);
 
 		idleTimeout.apply(sshd);
 
 		Map<String, Object> properties = sshd.getProperties();
-		Assert.assertEquals(86400000L, properties.get(ServerFactoryManager.IDLE_TIMEOUT));
+		Assert.assertEquals(timeoutInMilliseconds, properties.get(ServerFactoryManager.IDLE_TIMEOUT));
 		Object readTimeout = properties.get(ServerFactoryManager.NIO2_READ_TIMEOUT);
 		Assert.assertTrue(readTimeout instanceof Long);
-		Assert.assertTrue((Long) readTimeout > 86400000L);
+		Assert.assertTrue((Long) readTimeout > timeoutInMilliseconds);
 	}
 
 	@Test
