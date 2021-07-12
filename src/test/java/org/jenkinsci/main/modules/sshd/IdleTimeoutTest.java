@@ -1,7 +1,6 @@
 package org.jenkinsci.main.modules.sshd;
 
 
-import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.SshServer;
 import org.junit.Assert;
@@ -30,8 +29,8 @@ public class IdleTimeoutTest {
 		idleTimeout.apply(sshd);
 
 		Map<String, Object> properties = sshd.getProperties();
-		Assert.assertFalse(properties.containsKey(CoreModuleProperties.IDLE_TIMEOUT.getName()));
-		Assert.assertFalse(properties.containsKey(CoreModuleProperties.NIO2_READ_TIMEOUT.getName()));
+		Assert.assertFalse(properties.containsKey(ServerFactoryManager.IDLE_TIMEOUT));
+		Assert.assertFalse(properties.containsKey(ServerFactoryManager.NIO2_READ_TIMEOUT));
 	}
 
 	@Test
@@ -42,12 +41,10 @@ public class IdleTimeoutTest {
 		idleTimeout.apply(sshd);
 
 		Map<String, Object> properties = sshd.getProperties();
-		Assert.assertEquals(timeoutInMilliseconds, properties.get(CoreModuleProperties.IDLE_TIMEOUT.getName()));
-		/* TODO review NIO2_READ_TIMEOUT default value is 0 now, so the condicion is the other way around
-		Object readTimeout = properties.get(CoreModuleProperties.NIO2_READ_TIMEOUT.getName());
+		Assert.assertEquals(timeoutInMilliseconds, properties.get(ServerFactoryManager.IDLE_TIMEOUT));
+		Object readTimeout = properties.get(ServerFactoryManager.NIO2_READ_TIMEOUT);
 		Assert.assertTrue(readTimeout instanceof Long);
 		Assert.assertTrue((Long) readTimeout > timeoutInMilliseconds);
-		 */
 	}
 
 	@Test
@@ -57,8 +54,8 @@ public class IdleTimeoutTest {
 		idleTimeout.apply(sshd);
 
 		Map<String, Object> properties = sshd.getProperties();
-		Assert.assertFalse(properties.containsKey(CoreModuleProperties.IDLE_TIMEOUT.getName()));
-		Assert.assertFalse(properties.containsKey(CoreModuleProperties.NIO2_READ_TIMEOUT.getName()));
+		Assert.assertFalse(properties.containsKey(ServerFactoryManager.IDLE_TIMEOUT));
+		Assert.assertFalse(properties.containsKey(ServerFactoryManager.NIO2_READ_TIMEOUT));
 	}
 
 }
