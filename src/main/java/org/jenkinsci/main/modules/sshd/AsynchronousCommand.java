@@ -3,14 +3,15 @@ package org.jenkinsci.main.modules.sshd;
 import hudson.model.User;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
-import org.apache.sshd.server.SessionAware;
 import org.apache.sshd.server.session.ServerSession;
+import org.apache.sshd.server.session.ServerSessionAware;
 import org.jenkinsci.main.modules.sshd.SshCommandFactory.CommandLine;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +20,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
-import org.acegisecurity.context.SecurityContext;
-
 import javax.annotation.CheckForNull;
 
 /**
@@ -28,7 +27,7 @@ import javax.annotation.CheckForNull;
  *
  * @author Kohsuke Kawaguchi
  */
-public abstract class AsynchronousCommand implements Command, SessionAware, Runnable {
+public abstract class AsynchronousCommand implements Command, ServerSessionAware, Runnable {
     private InputStream in;
     private OutputStream out;
     private OutputStream err;
@@ -117,7 +116,7 @@ public abstract class AsynchronousCommand implements Command, SessionAware, Runn
             SecurityContext old = SecurityContextHolder.getContext();
             User user = getCurrentUser();
             if (user!=null)
-                ACL.impersonate(user.impersonate());
+                ACL.as(user);
 
             try {
                 i = AsynchronousCommand.this.runCommand();
