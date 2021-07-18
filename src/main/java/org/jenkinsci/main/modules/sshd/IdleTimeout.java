@@ -1,7 +1,8 @@
 package org.jenkinsci.main.modules.sshd;
 
-import org.apache.sshd.server.ServerFactoryManager;
+import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.SshServer;
+import java.time.Duration;
 import java.util.logging.Logger;
 
 import org.kohsuke.accmod.Restricted;
@@ -15,6 +16,7 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 public class IdleTimeout {
 
 	private static final Logger LOGGER = Logger.getLogger(IdleTimeout.class.getName());
+	public static final long ADDITIONAL_TIME_FOR_TIMEOUT = 60000;
 
 	private final Long timeoutInMilliseconds;
 
@@ -42,13 +44,13 @@ public class IdleTimeout {
 			return;
 		}
 
-		sshd.getProperties().put(ServerFactoryManager.IDLE_TIMEOUT, timeoutInMilliseconds);
+		CoreModuleProperties.IDLE_TIMEOUT.set(sshd, Duration.ofMillis(timeoutInMilliseconds));
 		// Read timeout must also be changed
 		long readTimeout = 0;
 		if (timeoutInMilliseconds != 0) {
-			readTimeout = ServerFactoryManager.DEFAULT_NIO2_READ_TIMEOUT - ServerFactoryManager.DEFAULT_IDLE_TIMEOUT + timeoutInMilliseconds;
+			readTimeout = ADDITIONAL_TIME_FOR_TIMEOUT + timeoutInMilliseconds;
 		}
-		sshd.getProperties().put(ServerFactoryManager.NIO2_READ_TIMEOUT, readTimeout);
+		CoreModuleProperties.NIO2_READ_TIMEOUT.set(sshd, Duration.ofSeconds(readTimeout));
 	}
 
 }
