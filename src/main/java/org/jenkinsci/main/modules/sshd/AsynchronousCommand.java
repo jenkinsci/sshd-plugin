@@ -110,8 +110,8 @@ public abstract class AsynchronousCommand implements Command, ServerSessionAware
         try {
             int i;
             User user = getCurrentUser();
-            if(user!=null){
-              try(ACLContext ctx = ACL.as(user)){
+            if (user != null) {
+              try (ACLContext ctx = ACL.as(user)) {
                 i = AsynchronousCommand.this.runCommand();
               }
             } else {
