@@ -111,20 +111,16 @@ public abstract class AsynchronousCommand implements Command, ServerSessionAware
     public void run() {
         try {
             int i;
-
-            // run the command in the context of the authenticated user
-            SecurityContext old = SecurityContextHolder.getContext();
             User user = getCurrentUser();
-            if (user!=null)
-                ACL.as(user);
-
-            try {
+            if(user!=null){
+              try(ACLContext ctx = ACL.as(user)){
                 i = AsynchronousCommand.this.runCommand();
-            } finally {
-                out.flush(); // working around SSHD-154
-                err.flush();
-                SecurityContextHolder.setContext(old);
+              }
+            } else {
+              i = AsynchronousCommand.this.runCommand();
             }
+            out.flush(); // working around SSHD-154
+            err.flush();
             callback.onExit(i);
         } catch (Exception e) {
             // report the cause of the death to the client
