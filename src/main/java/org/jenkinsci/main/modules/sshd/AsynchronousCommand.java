@@ -118,8 +118,7 @@ public abstract class AsynchronousCommand implements Command, ServerSessionAware
             } else {
               i = AsynchronousCommand.this.runCommand();
             }
-            out.flush(); // working around SSHD-154
-            err.flush();
+            flushOutputs();
             callback.onExit(i);
         } catch (Exception e) {
             // report the cause of the death to the client
@@ -127,9 +126,20 @@ public abstract class AsynchronousCommand implements Command, ServerSessionAware
             PrintWriter ps = new PrintWriter(new OutputStreamWriter(err, Charset.defaultCharset()));
             e.printStackTrace(ps);
             ps.flush();
-            out.flush(); // working around SSHD-154
-            err.flush();
+            flushOutputs();
             callback.onExit(255,e.getMessage());
+        }
+    }
+
+    /**
+     *  working around SSHD-154
+     */
+    private void flushOutputs() {
+        try {
+            out.flush();
+            err.flush();
+        } catch (IOException ioException) {
+           //NOOP
         }
     }
 
