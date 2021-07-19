@@ -126,7 +126,8 @@ public abstract class AsynchronousCommand implements Command, ServerSessionAware
             PrintWriter ps = new PrintWriter(new OutputStreamWriter(err, Charset.defaultCharset()));
             e.printStackTrace(ps);
             ps.flush();
-
+            out.flush(); // working around SSHD-154
+            err.flush();
             callback.onExit(255,e.getMessage());
         }
     }
