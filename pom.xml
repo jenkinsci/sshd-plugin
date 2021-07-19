@@ -29,7 +29,7 @@
   </licenses>
 
   <properties>
-    <revision>3.0.5</revision>
+    <revision>3.1.0</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.282</jenkins.version> <!-- Current weekly -->
     <java.level>8</java.level>
