@@ -10,8 +10,6 @@ import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.session.ServerSessionAware;
 import org.jenkinsci.main.modules.sshd.SshCommandFactory.CommandLine;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.io.InputStream;
