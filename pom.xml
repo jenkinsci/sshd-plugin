@@ -61,7 +61,7 @@
     <dependency>
       <groupId>org.jenkins-ci.modules</groupId>
       <artifactId>instance-identity</artifactId>
-      <version>2.2</version> <!-- We use the module for the moment -->
+      <version>3.0.1</version> <!-- We use the module for the moment -->
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci</groupId>
