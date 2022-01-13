@@ -1,5 +1,6 @@
 package org.jenkinsci.main.modules.sshd;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.model.User;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
@@ -18,8 +19,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
-
-import javax.annotation.CheckForNull;
 
 /**
  * Partial {@link Command} implementation that uses a thread to run a command.

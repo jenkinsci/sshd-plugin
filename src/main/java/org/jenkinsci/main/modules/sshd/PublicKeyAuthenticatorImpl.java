@@ -1,5 +1,7 @@
 package org.jenkinsci.main.modules.sshd;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.User;
 import jenkins.security.SecurityListener;
 import org.acegisecurity.AuthenticationException;
@@ -10,8 +12,6 @@ import org.apache.sshd.server.session.ServerSession;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +67,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
         return u;
     }
 
-    private @CheckForNull UserDetails verifyUserUsingSecurityRealm(@Nonnull User user) {
+    private @CheckForNull UserDetails verifyUserUsingSecurityRealm(@NonNull User user) {
         try {
             return user.getUserDetailsForImpersonation();
         } catch (UsernameNotFoundException e) {

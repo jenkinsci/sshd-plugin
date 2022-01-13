@@ -1,10 +1,10 @@
 package org.jenkinsci.main.modules.sshd;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.Extension;
 import hudson.model.PageDecorator;
 import jenkins.model.Jenkins;
 
-import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import java.net.URL;
 import java.util.logging.Level;
