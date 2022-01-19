@@ -81,9 +81,9 @@ public abstract class AsynchronousCommand implements Command, ServerSessionAware
 
     @CheckForNull
     protected User getCurrentUser() {
-        final Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins != null && jenkins.isUseSecurity()) {
-            return User.get(getSession().getUsername());    // then UserAuthNamedFactory must have done public key auth
+        final Jenkins jenkins = Jenkins.get();
+        if (jenkins.isUseSecurity()) {
+            return User.getById(getSession().getUsername(), true);    // then UserAuthNamedFactory must have done public key auth
         } else {
             return null;    // not authenticated. anonymous.
         }

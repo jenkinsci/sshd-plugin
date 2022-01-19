@@ -64,6 +64,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -130,7 +131,7 @@ public class CLITest {
         SSHD.get().setPort(0);
         File privkey = tmp.newFile("id_rsa");
         FileUtils.copyURLToFile(CLITest.class.getResource("id_rsa"), privkey);
-        User.get("admin").addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"))));
+        User.getById("admin", true).addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"), StandardCharsets.UTF_8)));
         assertNotEquals(0, new Launcher.LocalLauncher(StreamTaskListener.fromStderr()).launch().cmds(
             "java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "-strictHostKey", "who-am-i"
         ).stdout(System.out).stderr(System.err).join());
@@ -162,7 +163,7 @@ public class CLITest {
         SSHD.get().setPort(0);
         File privkey = tmp.newFile("id_rsa");
         FileUtils.copyURLToFile(CLITest.class.getResource("id_rsa"), privkey);
-        User.get("admin").addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"))));
+        User.getById("admin", true).addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"), StandardCharsets.UTF_8)));
         FreeStyleProject p = r.createFreeStyleProject("p");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         p.getBuildersList().add(new SleepBuilder(TimeUnit.MINUTES.toMillis(2)));
