@@ -1,5 +1,6 @@
 package org.jenkinsci.main.modules.cli.auth.ssh;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.UserProperty;
 import hudson.model.UserPropertyDescriptor;
@@ -52,6 +53,7 @@ public class UserPropertyImpl extends UserProperty {
     @Extension
     @Symbol("sshPublicKey")
     public static final class DescriptorImpl extends UserPropertyDescriptor {
+        @NonNull
         public String getDisplayName() {
             return "SSH Public Keys";
         }

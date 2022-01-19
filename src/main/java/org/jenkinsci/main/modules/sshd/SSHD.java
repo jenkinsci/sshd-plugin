@@ -1,5 +1,6 @@
 package org.jenkinsci.main.modules.sshd;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.init.InitMilestone;
@@ -15,7 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForSigned;
-import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
 
@@ -65,6 +65,7 @@ public class SSHD extends GlobalConfiguration {
     private static final String EXCLUDED_MACS = SystemProperties.getString(SSHD.class.getName() + ".excludedMacs",
             "hmac-md5, hmac-md5-96, hmac-sha1-96");
 
+    @NonNull
     @Override
     public GlobalConfigurationCategory getCategory() {
         return GlobalConfigurationCategory.get(GlobalConfigurationCategory.Security.class);
@@ -126,7 +127,7 @@ public class SSHD extends GlobalConfiguration {
      * Cyphers will be considered as activated if they are defined in {@link #ENABLED_CIPHERS} and supported in the current JVM.
      * @return List of factories
      */
-    @Nonnull
+    @NonNull
     /*package*/ static List<NamedFactory<Cipher>> getActivatedCiphers() {
         final List<NamedFactory<Cipher>> activatedCiphers = new ArrayList<>(ENABLED_CIPHERS.size());
         for (NamedFactory<Cipher> cipher : ENABLED_CIPHERS) {
