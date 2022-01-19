@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.CheckForSigned;
-import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
 
 import jenkins.model.GlobalConfiguration;
@@ -24,6 +22,7 @@ import jenkins.model.GlobalConfigurationCategory;
 import jenkins.util.ServerTcpPort;
 import jenkins.util.SystemProperties;
 import jenkins.util.Timer;
+import net.jcip.annotations.GuardedBy;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.sshd.common.NamedFactory;
@@ -77,7 +76,7 @@ public class SSHD extends GlobalConfiguration {
     @Inject
     private transient InstanceIdentity identity;
 
-    private volatile @CheckForSigned int port = -1;
+    private volatile int port = -1;
 
     public SSHD() {
         load();
@@ -89,7 +88,7 @@ public class SSHD extends GlobalConfiguration {
      * @return
      *      -1 if disabled, 0 if random port is selected, otherwise the port number configured.
      */
-    public @CheckForSigned int getPort() {
+    public int getPort() {
         return port;
     }
 
@@ -98,7 +97,7 @@ public class SSHD extends GlobalConfiguration {
      *
      * @return Actual port number or -1 if disabled.
      */
-    public synchronized @CheckForSigned int getActualPort() {
+    public synchronized int getActualPort() {
         if (port==-1)   return -1;
         if (sshd!=null)
             return sshd.getPort();
