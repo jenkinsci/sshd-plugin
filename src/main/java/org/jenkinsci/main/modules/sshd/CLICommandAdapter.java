@@ -26,7 +26,9 @@ public class CLICommandAdapter extends SshCommandFactory {
             @Override
             public int runCommand() throws IOException {
                 User u = getCurrentUser();
-                if (u!=null)    c.setTransportAuth(u.impersonate());
+                if (u != null) {
+                    c.setTransportAuth2(u.impersonate2());
+                }
 
                 CommandLine cmds = getCmdLine();
 

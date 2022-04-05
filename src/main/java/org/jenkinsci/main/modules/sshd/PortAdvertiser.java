@@ -25,10 +25,7 @@ public class PortAdvertiser extends PageDecorator {
         try {
             int p = sshd.getActualPort();
             if (p>0) {
-                final Jenkins jenkins = Jenkins.getInstance();
-                if (jenkins == null) {
-                    throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-                }
+                final Jenkins jenkins = Jenkins.get();
                 return (host != null ? host : new URL(jenkins.getRootUrl()).getHost()) + ":" + p;
             }
         } catch (Exception e) {

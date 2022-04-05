@@ -18,8 +18,8 @@ class UserAuthNamedFactory implements UserAuthFactory {
     UserAuthFactory none = UserAuthNoneFactory.INSTANCE;
 
     private UserAuthFactory select() {
-        final Jenkins jenkins = Jenkins.getInstance();
-        return (jenkins != null && jenkins.isUseSecurity()) ? publicKey : none;
+        final Jenkins jenkins = Jenkins.get();
+        return jenkins.isUseSecurity() ? publicKey : none;
     }
 
     public String getName() {

@@ -25,7 +25,7 @@ public class UserPropertyImplTest {
 
     private void testRoundtrip(String publicKey) throws Exception {
         r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
-        User foo = User.get("foo");
+        User foo = User.getById("foo", true);
         foo.addProperty(new UserPropertyImpl(publicKey));
         r.configRoundtrip(foo);
         assertEquals(publicKey, foo.getProperty(UserPropertyImpl.class).authorizedKeys);
