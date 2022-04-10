@@ -1,0 +1,2 @@
+<?jelly escape-by-default='true'?>
+<div>Adds SSH server functionality to Jenkins, exposing CLI commands through it.</div>
