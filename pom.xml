@@ -9,7 +9,7 @@
 
   <groupId>org.jenkins-ci.modules</groupId> <!-- we use the modules groupId for historical reasons -->
   <artifactId>sshd</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>${revision}.${changelist}</version>
   <packaging>hpi</packaging>
   <name>SSH server</name>
   <description>Adds SSH server functionality to Jenkins, exposing CLI commands through it</description>
@@ -29,8 +29,8 @@
   </licenses>
 
   <properties>
-    <revision>3.1.1</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <revision>3</revision>
+    <changelist>999999-SNAPSHOT</changelist>
     <jenkins.version>2.289.1</jenkins.version>
     <java.level>8</java.level>
     <slf4j.version>1.7.32</slf4j.version>
