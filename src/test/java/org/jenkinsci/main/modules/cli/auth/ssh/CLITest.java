@@ -25,17 +25,19 @@
 package org.jenkinsci.main.modules.cli.auth.ssh;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
+import hudson.Extension;
 import hudson.Launcher;
 import hudson.Proc;
+import hudson.cli.CLICommand;
 import hudson.model.FreeStyleProject;
 import hudson.model.UnprotectedRootAction;
 import hudson.model.User;
 import hudson.security.csrf.CrumbExclusion;
 import hudson.util.StreamTaskListener;
-import jenkins.model.GlobalConfiguration;
-import jenkins.model.Jenkins;
 import io.jenkins.cli.shaded.org.apache.commons.io.FileUtils;
 import io.jenkins.cli.shaded.org.apache.commons.io.output.TeeOutputStream;
+import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.sshd.common.util.io.ModifiableFileWatcher;
 import org.jenkinsci.main.modules.sshd.SSHD;
@@ -70,11 +72,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeThat;
@@ -178,6 +181,28 @@ public class CLITest {
         System.err.println("Killing client");
         proc.kill();
         r.waitForCompletion(p.getLastBuild());
+    }
+
+    @Issue("JENKINS-68541")
+    @Test
+    public void outputStream() throws Exception {
+        home = tempHome();
+        grabCliJar();
+
+        r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
+        r.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy().grant(Jenkins.ADMINISTER).everywhere().to("admin"));
+        SSHD.get().setPort(0);
+        File privkey = tmp.newFile("id_rsa");
+        FileUtils.copyURLToFile(CLITest.class.getResource("id_rsa"), privkey);
+        User.getById("admin", true).addProperty(new UserPropertyImpl(IOUtils.toString(CLITest.class.getResource("id_rsa.pub"), StandardCharsets.UTF_8)));
+        StreamTaskListener stl = StreamTaskListener.fromStderr();
+        List<String> args = Arrays.asList("java", "-Duser.home=" + home, "-jar", jar.getAbsolutePath(), "-s", r.getURL().toString(), "-ssh", "-user", "admin", "-i", privkey.getAbsolutePath(), "close-stdout-stream");
+        int ret = new Launcher.LocalLauncher(stl).launch().cmds(args)
+            .stdout(System.out)
+            .stderr(System.err)
+            .start()
+            .joinWithTimeout(5, TimeUnit.SECONDS, stl);
+        assertEquals(0, ret);
     }
 
     @Test @Issue("JENKINS-44361")
@@ -295,6 +320,21 @@ public class CLITest {
         public boolean process(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
             chain.doFilter(request, response);
             return true;
+        }
+    }
+
+    @Extension
+    public static class CloseStdoutStreamCommand extends CLICommand {
+
+        @Override
+        public String getShortDescription() {
+            return "Close stdout";
+        }
+
+        @Override
+        protected int run() {
+            stdout.close();
+            return 0;
         }
     }
 }
