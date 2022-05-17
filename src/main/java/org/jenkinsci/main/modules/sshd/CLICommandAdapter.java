@@ -35,6 +35,7 @@ public class CLICommandAdapter extends SshCommandFactory {
                 CommandLine cmds = getCmdLine();
 
                 //TODO: Consider switching to UTF-8
+                //TODO: Consider removing the CloseProofOutputStream wrapper when SSHD-1257 is available
                 return c.main(cmds.subList(1,cmds.size()), Locale.getDefault(), getInputStream(),
                         new PrintStream(new CloseProofOutputStream(getOutputStream()), false, Charset.defaultCharset().toString()),
                         new PrintStream(new CloseProofOutputStream(getErrorStream()), false, Charset.defaultCharset().toString()));
