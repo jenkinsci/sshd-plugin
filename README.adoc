@@ -31,7 +31,7 @@ Defines the SSH public key user property and provides related API for Jenkins pl
 
 === Changelog
 
-See link:https://github.com/jenkinsci/sshd-module/releases[GitHub releases]
+See link:https://github.com/jenkinsci/sshd-plugin/releases[GitHub releases]
 
 for old releases see See link:CHANGELOG.md[CHANGELOG.md].
 

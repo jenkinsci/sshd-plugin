@@ -12,8 +12,8 @@ Release date: (Feb 22, 2021)
 
 Release date: (Oct 12, 2020)
 
-* [PR #35](https://github.com/jenkinsci/sshd-module/pull/35) - Make key exchange and MAC algorithms configurable via system properties, disable known obsolete algorithms by default.
-* [PR #28](https://github.com/jenkinsci/sshd-module/pull/28), [PR #31](https://github.com/jenkinsci/sshd-module/pull/31), [PR #32](https://github.com/jenkinsci/sshd-module/pull/32) - Plugin modernization
+* [PR #35](https://github.com/jenkinsci/sshd-plugin/pull/35) - Make key exchange and MAC algorithms configurable via system properties, disable known obsolete algorithms by default.
+* [PR #28](https://github.com/jenkinsci/sshd-plugin/pull/28), [PR #31](https://github.com/jenkinsci/sshd-plugin/pull/31), [PR #32](https://github.com/jenkinsci/sshd-plugin/pull/32) - Plugin modernization
 
 ### 2.6
 
@@ -34,7 +34,7 @@ Include the native EdDSA implementation into the module ([net.i2p.crypto:eddsa](
 
 Release date: (Feb 04, 2018)
 
-* [PR #23](https://github.com/jenkinsci/sshd-module/pull/23) - 
+* [PR #23](https://github.com/jenkinsci/sshd-plugin/pull/23) -
 Update SSHD Core from 1.6.0 to 1.7.0
 ([Full Changelog](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12341097&styleName=Text&projectId=12310849&Create=Create&atl_token=A5KQ-2QAV-T4JA-FDED%7C47f5fd1e799680219ff14477b5b2c29ce7aaf6fd%7Clin))
 
@@ -44,22 +44,22 @@ Release date: (Oct 27, 2017)
 
 * [JENKINS-27026](https://issues.jenkins-ci.org/browse/JENKINS-27026) - 
 Fire authentication events in [SecurityListener](https://jenkins.io/doc/developer/extensions/jenkins-core/#securitylistener)s when a user connects using SSH.
-* [PR #21](https://github.com/jenkinsci/sshd-module/pull/21) -
+* [PR #21](https://github.com/jenkinsci/sshd-plugin/pull/21) -
 Update Parent POM and resolve upper bound dependency issues.
 
 #### 2.2
 
 Release Date: (Oct 13, 2017)
 
-* [#20](https://github.com/jenkinsci/sshd-module/pull/20) -
+* [#20](https://github.com/jenkinsci/sshd-plugin/pull/20) -
 Make SSHD startup synchronous (partially reverts changes in 2.1). 
 
 #### 2.1
 
 Release Date: (September 25, 2017)
 
-* [#19](https://github.com/jenkinsci/sshd-module/pull/19) - Do not wait for `SSHD` to be fully up during Jenkins startup.
-* [#19](https://github.com/jenkinsci/sshd-module/pull/19) - Avoid race condition between `SSHD#start` and `SSHD#setPort`.
+* [#19](https://github.com/jenkinsci/sshd-plugin/pull/19) - Do not wait for `SSHD` to be fully up during Jenkins startup.
+* [#19](https://github.com/jenkinsci/sshd-plugin/pull/19) - Avoid race condition between `SSHD#start` and `SSHD#setPort`.
 
 #### 2.0
 
@@ -100,14 +100,14 @@ Disable SSHD port by default on new installations.
 
 Release date: (Mar 11, 2017) => Jenkins `2.51`
 
-* [PR #9](https://github.com/jenkinsci/sshd-module/pull/9) - 
+* [PR #9](https://github.com/jenkinsci/sshd-plugin/pull/9) -
 Move SSH server port configuration to security options page.
 
 #### 1.9
 
 Release date: (Dec 11, 2016) => Jenkins `2.37`, backported to `2.32.2`
 
-* [PR #8](https://github.com/jenkinsci/sshd-module/pull/8) - 
+* [PR #8](https://github.com/jenkinsci/sshd-plugin/pull/8) -
 Update SSHD Core from `0.8.0` to `0.14.0`.
 * [JENKINS-40362](https://issues.jenkins-ci.org/browse/JENKINS-40362) -
 SSHD Module: Handshake was failing (wrong shared secret) 1 out of 256 times due to 
