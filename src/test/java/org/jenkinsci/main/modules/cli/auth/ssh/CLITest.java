@@ -84,7 +84,7 @@ import static org.junit.Assume.assumeThat;
 import static org.junit.Assume.assumeTrue;
 
 /**
- * Tests CLI operation with the SSH module.
+ * Tests CLI operation with the classes in the {@code org.jenkinsci.main.modules.sshd} package.
  * Extracted from https://github.com/jenkinsci/jenkins/blob/e681b4ff928435a500dcfb372cc9fc15b1c94413/test/src/test/java/hudson/cli/CLITest.java
  */
 public class CLITest {

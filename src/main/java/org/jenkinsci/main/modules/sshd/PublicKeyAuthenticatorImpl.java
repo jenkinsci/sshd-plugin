@@ -17,7 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * {@link PublickeyAuthenticator} that uses ssh-cli-auth Jenkins module to match up
+ * {@link PublickeyAuthenticator} that uses the classes in the {@code
+ * org.jenkinsci.main.modules.cli.auth.ssh} package to match up
  * the public key against what the user has registered.
  *
  * @author Kohsuke Kawaguchi
