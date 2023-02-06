@@ -159,8 +159,6 @@ public class SSHD extends GlobalConfiguration {
         sshd.setKeyExchangeFactories(filterKeyExchanges(sshd.getKeyExchangeFactories()));
         sshd.setMacFactories(filterMacs(sshd.getMacFactories()));
         sshd.setPort(port);
-        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
-
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
             @Override
             public Iterable<KeyPair> loadKeys(SessionContext session) throws IOException, GeneralSecurityException {
