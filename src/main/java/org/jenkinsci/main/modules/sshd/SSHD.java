@@ -34,7 +34,6 @@ import org.apache.sshd.common.mac.Mac;
 import org.apache.sshd.common.session.SessionContext;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuthFactory;
-import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 import org.kohsuke.stapler.StaplerRequest;
 
