@@ -51,7 +51,15 @@
   <dependencies>
     <dependency>
       <groupId>io.jenkins.plugins.mina-sshd-api</groupId>
+      <artifactId>mina-sshd-api-common</artifactId>
+      <!-- TODO: remove <version/> once 2.10.0.x makes it to the released bom -->
+      <version>2.10.0-69.v28e3e36d18eb_</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins.mina-sshd-api</groupId>
       <artifactId>mina-sshd-api-core</artifactId>
+      <!-- TODO: remove <version/> once 2.10.0.x makes it to the released bom -->
+      <version>2.10.0-69.v28e3e36d18eb_</version>
     </dependency>
     <dependency>
   	  <groupId>net.i2p.crypto</groupId>
