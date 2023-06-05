@@ -24,7 +24,7 @@
 
 package org.jenkinsci.main.modules.cli.auth.ssh;
 
-import com.gargoylesoftware.htmlunit.WebResponse;
+import org.htmlunit.WebResponse;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.Proc;
