@@ -5,7 +5,6 @@ import hudson.Extension;
 import hudson.model.PageDecorator;
 import jenkins.model.Jenkins;
 
-import javax.inject.Inject;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,13 +16,11 @@ import java.util.logging.Logger;
  */
 @Extension
 public class PortAdvertiser extends PageDecorator {
-    @Inject
-    public SSHD sshd;
 
     @CheckForNull
     public String getEndpoint() {
         try {
-            int p = sshd.getActualPort();
+            int p = SSHD.get().getActualPort();
             if (p>0) {
                 final Jenkins jenkins = Jenkins.get();
                 return (host != null ? host : new URL(jenkins.getRootUrl()).getHost()) + ":" + p;
