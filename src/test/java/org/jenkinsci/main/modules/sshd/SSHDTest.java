@@ -28,7 +28,6 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.springframework.dao.DataAccessException;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyPair;
@@ -47,8 +46,6 @@ import static org.junit.Assume.assumeFalse;
  * @author Kohsuke Kawaguchi
  */
 public class SSHDTest {
-    @Inject
-    SSHD sshd;
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
@@ -63,7 +60,7 @@ public class SSHDTest {
      */
     @Test
     public void configRoundtrip() throws Exception {
-        j.jenkins.getInjector().injectMembers(this);
+        SSHD sshd = SSHD.get();
 
         for (int i : new int[]{-1,0,100}) {
             sshd.setPort(i);

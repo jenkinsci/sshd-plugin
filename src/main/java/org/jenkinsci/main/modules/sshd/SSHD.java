@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
@@ -71,9 +70,6 @@ public class SSHD extends GlobalConfiguration {
 
     @GuardedBy("this")
     private transient SshServer sshd;
-
-    @Inject
-    private transient InstanceIdentity identity;
 
     private volatile int port = -1;
 
@@ -161,6 +157,7 @@ public class SSHD extends GlobalConfiguration {
         sshd.setKeyPairProvider(new AbstractKeyPairProvider() {
             @Override
             public Iterable<KeyPair> loadKeys(SessionContext session) throws IOException, GeneralSecurityException {
+                InstanceIdentity identity = InstanceIdentity.get();
                 return Collections.singletonList(new KeyPair(identity.getPublic(), identity.getPrivate()));
             }
         });
@@ -257,7 +254,7 @@ public class SSHD extends GlobalConfiguration {
     private static final Logger LOGGER = Logger.getLogger(SSHD.class.getName());
 
     public static SSHD get() {
-        return ExtensionList.lookup(GlobalConfiguration.class).get(SSHD.class);
+        return ExtensionList.lookupSingleton(SSHD.class);
     }
 
     @Initializer(after= InitMilestone.JOB_LOADED,fatal=false)

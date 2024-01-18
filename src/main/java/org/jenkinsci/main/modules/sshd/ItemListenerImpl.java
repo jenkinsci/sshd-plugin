@@ -3,7 +3,6 @@ package org.jenkinsci.main.modules.sshd;
 import hudson.Extension;
 import hudson.model.listeners.ItemListener;
 
-import javax.inject.Inject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,12 +11,11 @@ import java.util.logging.Logger;
  */
 @Extension
 public class ItemListenerImpl extends ItemListener {
-    @Inject
-    public SSHD sshd;
     
+    @Override
     public void onBeforeShutdown() {
         try {
-            sshd.stop();
+            SSHD.get().stop();
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Failed to shutdown SSHD",e);
         }
