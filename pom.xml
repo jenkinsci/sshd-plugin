@@ -58,9 +58,9 @@
       <artifactId>mina-sshd-api-core</artifactId>
     </dependency>
     <dependency>
-  	  <groupId>net.i2p.crypto</groupId>
-	  <artifactId>eddsa</artifactId>
-	  <version>0.3.0</version>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>eddsa-api</artifactId>
+      <version>0.3.0-4.v84c6f0f4969e</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.modules</groupId>
