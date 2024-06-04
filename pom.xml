@@ -32,7 +32,7 @@
   <properties>
     <revision>3</revision>
     <changelist>999999-SNAPSHOT</changelist>
-    <jenkins.version>2.361.4</jenkins.version>
+    <jenkins.version>2.426.3</jenkins.version>
     <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
   </properties>
 
@@ -40,8 +40,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.361.x</artifactId>
-        <version>2102.v854b_fec19c92</version>
+        <artifactId>bom-2.426.x</artifactId>
+        <version>2555.v3190a_8a_c60c6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -58,9 +58,9 @@
       <artifactId>mina-sshd-api-core</artifactId>
     </dependency>
     <dependency>
-  	  <groupId>net.i2p.crypto</groupId>
-	  <artifactId>eddsa</artifactId>
-	  <version>0.3.0</version>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>eddsa-api</artifactId>
+      <version>0.3.0-4.v84c6f0f4969e</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.modules</groupId>
