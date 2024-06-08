@@ -58,6 +58,17 @@ public class UserPropertyImpl extends UserProperty {
             return "SSH Public Keys";
         }
 
+        //        @Override
+        //        public @NonNull UserPropertyCategory getUserPropertyCategory() {
+        //            return UserPropertyCategory.get(UserPropertyCategory.Security.class);
+        //        }
+
+        // replace with above method when bumping core to version including:
+        // https://github.com/jenkinsci/jenkins/pull/7268
+        public String getUserPropertyCategoryAsString() {
+            return "security";
+        }
+
         public UserProperty newInstance(User user) {
             return null;
         }
