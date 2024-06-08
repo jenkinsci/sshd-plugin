@@ -65,7 +65,7 @@ public class UserPropertyImpl extends UserProperty {
 
         // replace with above method when bumping core to version including:
         // https://github.com/jenkinsci/jenkins/pull/7268
-        public @CheckForNull String getUserPropertyCategoryAsString() {
+        public String getUserPropertyCategoryAsString() {
             return "security";
         }
 
