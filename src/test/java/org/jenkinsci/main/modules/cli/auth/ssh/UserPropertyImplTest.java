@@ -2,7 +2,11 @@ package org.jenkinsci.main.modules.cli.auth.ssh;
 
 import hudson.model.User;
 import hudson.util.FormValidation;
+
+import static org.htmlunit.html.HtmlFormUtil.submit;
 import static org.junit.Assert.*;
+
+import org.htmlunit.FailingHttpStatusCodeException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -23,11 +27,25 @@ public class UserPropertyImplTest {
         testRoundtrip(PUBLIC_DSA_KEY);
     }
 
+    public User configRoundtrip(User u) throws Exception {
+        try {
+            submit(r.createWebClient().goTo(u.getUrl() + "/security/").getFormByName("config"));
+        } catch (FailingHttpStatusCodeException e) {
+            // prior to https://github.com/jenkinsci/jenkins/pull/7268
+            if (e.getStatusCode() == 404) {
+                r.configRoundtrip(u);
+            } else {
+                throw e;
+            }
+        }
+        return u;
+    }
+
     private void testRoundtrip(String publicKey) throws Exception {
         r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
         User foo = User.getById("foo", true);
         foo.addProperty(new UserPropertyImpl(publicKey));
-        r.configRoundtrip(foo);
+        configRoundtrip(foo);
         assertEquals(publicKey, foo.getProperty(UserPropertyImpl.class).authorizedKeys);
     }
 
