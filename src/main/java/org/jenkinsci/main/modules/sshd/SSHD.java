@@ -34,7 +34,7 @@ import org.apache.sshd.common.session.SessionContext;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuthFactory;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -240,7 +240,7 @@ public class SSHD extends GlobalConfiguration {
     }
 
     @Override
-    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+    public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
         setPort(new ServerTcpPort(json.getJSONObject("port")).getPort());
         return true;
     }
