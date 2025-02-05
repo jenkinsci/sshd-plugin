@@ -54,13 +54,13 @@ import org.jvnet.hudson.test.TestExtension;
 import org.kohsuke.stapler.HttpResponses.HttpResponseException;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerProxy;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -234,11 +234,11 @@ public class CLITest {
         }
 
         @Override public Object getTarget() {
-            doDynamic(Stapler.getCurrentRequest(), Stapler.getCurrentResponse());
+            doDynamic(Stapler.getCurrentRequest2(), Stapler.getCurrentResponse2());
             return this;
         }
 
-        public void doDynamic(StaplerRequest req, StaplerResponse rsp) {
+        public void doDynamic(StaplerRequest2 req, StaplerResponse2 rsp) {
             rsp.setStatus(200);
         }
 
@@ -297,15 +297,15 @@ public class CLITest {
         }
 
         @Override public Object getTarget() {
-            throw doDynamic(Stapler.getCurrentRequest(), Stapler.getCurrentResponse());
+            throw doDynamic(Stapler.getCurrentRequest2(), Stapler.getCurrentResponse2());
         }
 
-        public HttpResponseException doDynamic(StaplerRequest req, StaplerResponse rsp) {
+        public HttpResponseException doDynamic(StaplerRequest2 req, StaplerResponse2 rsp) {
             final String url = req.getRequestURIWithQueryString().replaceFirst("/cli-proxy", "");
             // Custom written redirect so no traces of Jenkins are present in headers
             return new HttpResponseException() {
                 @Override
-                public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+                public void generateResponse(StaplerRequest2 req, StaplerResponse2 rsp, Object node) throws IOException, ServletException {
                     rsp.setHeader("Location", url);
                     rsp.setContentType("text/html");
                     rsp.setStatus(HttpURLConnection.HTTP_MOVED_TEMP);
