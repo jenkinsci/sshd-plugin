@@ -5,6 +5,7 @@ import hudson.Extension;
 import hudson.model.UserProperty;
 import hudson.model.UserPropertyDescriptor;
 import hudson.model.User;
+import hudson.model.userproperty.UserPropertyCategory;
 import hudson.util.FormValidation;
 
 import java.io.BufferedReader;
@@ -58,15 +59,9 @@ public class UserPropertyImpl extends UserProperty {
             return "SSH Public Keys";
         }
 
-        //        @Override
-        //        public @NonNull UserPropertyCategory getUserPropertyCategory() {
-        //            return UserPropertyCategory.get(UserPropertyCategory.Security.class);
-        //        }
-
-        // replace with above method when bumping core to version including:
-        // https://github.com/jenkinsci/jenkins/pull/7268
-        public String getUserPropertyCategoryAsString() {
-            return "security";
+        @Override
+        public @NonNull UserPropertyCategory getUserPropertyCategory() {
+            return UserPropertyCategory.get(UserPropertyCategory.Security.class);
         }
 
         public UserProperty newInstance(User user) {
