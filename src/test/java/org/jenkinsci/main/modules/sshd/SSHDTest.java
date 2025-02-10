@@ -3,15 +3,14 @@ package org.jenkinsci.main.modules.sshd;
 import hudson.Functions;
 import hudson.security.AbstractPasswordBasedSecurityRealm;
 import hudson.security.GroupDetails;
-import org.acegisecurity.AccountExpiredException;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.CredentialsExpiredException;
-import org.acegisecurity.DisabledException;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.LockedException;
-import org.acegisecurity.userdetails.User;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
@@ -26,7 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.springframework.dao.DataAccessException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -154,12 +152,12 @@ public class SSHDTest {
     @Issue("JENKINS-55813")
     private static class InvalidUserTypesRealm extends AbstractPasswordBasedSecurityRealm {
         @Override
-        protected UserDetails authenticate(String user, String pass) throws AuthenticationException {
-            return loadUserByUsername(user);
+        protected UserDetails authenticate2(String user, String pass) throws AuthenticationException {
+            return loadUserByUsername2(user);
         }
 
         @Override
-        public UserDetails loadUserByUsername(String user) throws UsernameNotFoundException, DataAccessException {
+        public UserDetails loadUserByUsername2(String user) throws UsernameNotFoundException {
             switch (user) {
                 case "disabled":
                     throw new DisabledException(user);
@@ -174,12 +172,12 @@ public class SSHDTest {
                     throw new LockedException(user);
 
                 default:
-                    return new User(user, "", true, true, true, true, new GrantedAuthority[0]);
+                    return new User(user, "", true, true, true, true, List.of());
             }
         }
 
         @Override
-        public GroupDetails loadGroupByGroupname(String group) throws UsernameNotFoundException, DataAccessException {
+        public GroupDetails loadGroupByGroupname2(String groupname, boolean fetchMembers) throws UsernameNotFoundException {
             throw new UnsupportedOperationException();
         }
     }

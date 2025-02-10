@@ -4,9 +4,9 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.User;
 import jenkins.security.SecurityListener;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
@@ -41,7 +41,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
             return false;
         }
 
-        SecurityListener.fireAuthenticated(user.getUserDetailsForImpersonation());
+        SecurityListener.fireAuthenticated2(user.getUserDetailsForImpersonation2());
         return true;
     }
 
@@ -70,7 +70,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
     private @CheckForNull UserDetails verifyUserUsingSecurityRealm(@NonNull User user) {
         try {
-            return user.getUserDetailsForImpersonation();
+            return user.getUserDetailsForImpersonation2();
         } catch (UsernameNotFoundException e) {
             LOGGER.log(Level.FINE, e, () -> user.getId() + " is not a real user according to SecurityRealm");
             return null;
