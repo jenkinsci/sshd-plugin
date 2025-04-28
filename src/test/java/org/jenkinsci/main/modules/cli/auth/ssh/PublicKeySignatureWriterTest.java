@@ -2,7 +2,7 @@ package org.jenkinsci.main.modules.cli.auth.ssh;
 
 import com.trilead.ssh2.packets.TypesWriter;
 import org.apache.commons.codec.binary.Base64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.For;
 import org.jvnet.hudson.test.Issue;
 
@@ -17,11 +17,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @For(PublicKeySignatureWriter.class)
-public class PublicKeySignatureWriterTest {
+class PublicKeySignatureWriterTest {
 
+    // regression in 1.6
     @Test
-    @Issue("JENKINS-43669") // regression in 1.6
-    public void shouldBeSimilarToTrileadSSH() throws Exception {
+    @Issue("JENKINS-43669")
+    void shouldBeSimilarToTrileadSSH() throws Exception {
         byte[] publicBytes = Base64.decodeBase64(PUBLIC_RSA_KEY);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
