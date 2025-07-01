@@ -12,12 +12,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import org.apache.sshd.common.config.keys.KeyUtils;
 import org.apache.sshd.common.config.keys.PublicKeyEntry;
 import org.apache.sshd.server.auth.pubkey.KeySetPublickeyAuthenticator;
 import org.jenkinsci.Symbol;

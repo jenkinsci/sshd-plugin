@@ -4,19 +4,14 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.User;
 import jenkins.security.SecurityListener;
-import org.apache.sshd.common.config.keys.PublicKeyEntry;
-import org.apache.sshd.server.auth.pubkey.KeySetPublickeyAuthenticator;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
-import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
 import java.security.PublicKey;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
