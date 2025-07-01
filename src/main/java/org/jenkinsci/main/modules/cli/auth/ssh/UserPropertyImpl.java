@@ -41,7 +41,7 @@ public class UserPropertyImpl extends UserProperty {
     public boolean has(PublicKey pk) {
 
         KeySetPublickeyAuthenticator keySetPublickeyAuthenticator =
-                new KeySetPublickeyAuthenticator("foo", getPublicKeys(this.authorizedKeys));
+                new KeySetPublickeyAuthenticator(getClass().getName(), getPublicKeys(this.authorizedKeys));
         return keySetPublickeyAuthenticator.authenticate(null, pk, null);
     }
 
