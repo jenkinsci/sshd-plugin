@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -99,7 +100,7 @@ public class UserPropertyImpl extends UserProperty {
                 try {
                     getPublicKeys(s);
                 } catch (Exception ex) {
-                    return FormValidation.error(ex.getMessage());
+                    return FormValidation.warning(ex.getMessage());
                 }
             }
             return FormValidation.ok();

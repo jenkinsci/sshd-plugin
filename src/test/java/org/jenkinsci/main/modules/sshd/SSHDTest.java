@@ -1,6 +1,5 @@
 package org.jenkinsci.main.modules.sshd;
 
-import hudson.Functions;
 import hudson.security.AbstractPasswordBasedSecurityRealm;
 import hudson.security.GroupDetails;
 import org.apache.sshd.client.SshClient;
@@ -10,11 +9,11 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.SshException;
 import org.apache.sshd.common.cipher.Cipher;
-import org.apache.sshd.common.config.keys.KeyUtils;
-import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -48,6 +47,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
  * @author Kohsuke Kawaguchi
  */
 @WithJenkins
+@DisabledOnOs(value = OS.WINDOWS)
 class SSHDTest {
 
     private JenkinsRule r;
@@ -55,7 +55,6 @@ class SSHDTest {
     @BeforeEach
     void setUp(JenkinsRule rule) {
         r = rule;
-        assumeFalse(Functions.isWindows());
     }
 
     /**
