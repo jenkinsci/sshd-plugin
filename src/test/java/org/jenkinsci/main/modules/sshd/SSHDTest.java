@@ -10,6 +10,7 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.SshException;
 import org.apache.sshd.common.cipher.Cipher;
+import org.apache.sshd.common.config.keys.KeyUtils;
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -147,7 +149,7 @@ class SSHDTest {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048);
         KeyPair keyPair = generator.generateKeyPair();
-        String encodedPublicKey = "ssh-rsa " + new PublicKeySignatureWriter().asString(keyPair.getPublic());
+        String encodedPublicKey = "ssh-rsa " + Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
         user.addProperty(new UserPropertyImpl(encodedPublicKey));
         return keyPair;
     }

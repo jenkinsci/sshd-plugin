@@ -35,14 +35,28 @@ import java.security.PublicKey;
 import java.util.Objects;
 
 
+/**
+ * @deprecated the class may not be used as it has limitation for supported key
+ * only RSA and DSA and the asString method may generate a non documented string representatin of a key
+ */
 public class PublicKeySignatureWriter {
 
+    /**
+     * for most of the case it's possible to use something such
+     *
+     * @deprecated see class level javadoc
+     */
+    @Deprecated
     public String asString(PublicKey key) {
         if (key instanceof RSAPublicKey) return asString((RSAPublicKey) key);
         if (key instanceof DSAPublicKey) return asString((DSAPublicKey) key);
         throw new IllegalArgumentException("Unknown key type: " + key);
     }
 
+    /**
+     * @deprecated see class level javadoc
+     */
+    @Deprecated
     public String asString(DSAPublicKey key) {
         try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();

@@ -164,7 +164,6 @@ public class SSHD extends GlobalConfiguration {
 
         sshd.setShellFactory(null); // no shell support
         sshd.setCommandFactory(new CommandFactoryImpl());
-
         sshd.setPublickeyAuthenticator(new PublicKeyAuthenticatorImpl());
 
         // Allow to configure idle timeout with a system property
