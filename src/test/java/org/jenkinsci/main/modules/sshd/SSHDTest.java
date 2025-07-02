@@ -9,6 +9,12 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.SshException;
 import org.apache.sshd.common.cipher.Cipher;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.KeyGenerationParameters;
+import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator;
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +37,9 @@ import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Tests of {@link SSHD}.
@@ -83,7 +91,26 @@ class SSHDTest {
     @Issue("JENKINS-55813")
     void enabledUserShouldBeAuthorized() throws Exception {
         hudson.model.User enabled = hudson.model.User.getOrCreateByIdOrFullName("enabled");
-        KeyPair keyPair = generateKeys(enabled);
+        KeyPair keyPair = generateRSAKeys(enabled);
+        r.jenkins.setSecurityRealm(new InvalidUserTypesRealm());
+        SSHD server = SSHD.get();
+        server.setPort(0);
+        server.start();
+        try (SshClient client = SshClient.setUpDefaultClient()) {
+            client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
+            client.start();
+            ConnectFuture future = client.connect("enabled", new InetSocketAddress(server.getActualPort()));
+            try (ClientSession session = future.verify(10, TimeUnit.SECONDS).getSession()) {
+                session.addPublicKeyIdentity(keyPair);
+                assertTrue(session.auth().await(10, TimeUnit.SECONDS));
+            }
+        }
+    }
+
+    @Test
+    void enabledUserEd25519ShouldBeAuthorized() throws Exception {
+        hudson.model.User enabled = hudson.model.User.getOrCreateByIdOrFullName("enabled");
+        KeyPair keyPair = generateEd25519Keys(enabled);
         r.jenkins.setSecurityRealm(new InvalidUserTypesRealm());
         SSHD server = SSHD.get();
         server.setPort(0);
@@ -125,7 +152,7 @@ class SSHDTest {
 
     private void assertUserCannotLoginToSSH(String username) throws Exception {
         hudson.model.User user = hudson.model.User.getOrCreateByIdOrFullName(username);
-        KeyPair keyPair = generateKeys(user);
+        KeyPair keyPair = generateRSAKeys(user);
         r.jenkins.setSecurityRealm(new InvalidUserTypesRealm());
 
         SSHD server = SSHD.get();
@@ -142,7 +169,7 @@ class SSHDTest {
         }
     }
 
-    private static KeyPair generateKeys(hudson.model.User user) throws NoSuchAlgorithmException, IOException {
+    private static KeyPair generateRSAKeys(hudson.model.User user) throws NoSuchAlgorithmException, IOException {
         // I'd prefer to generate Ed25519 keys here, but the API is too awkward currently
         // ECDSA keys would be even more awkward as we'd need a copy of the curve parameters
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
@@ -150,6 +177,19 @@ class SSHDTest {
         KeyPair keyPair = generator.generateKeyPair();
         String encodedPublicKey = "ssh-rsa " + Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
         user.addProperty(new UserPropertyImpl(encodedPublicKey));
+        return keyPair;
+    }
+
+    private static KeyPair generateEd25519Keys(hudson.model.User user) throws Exception {
+        Security.addProvider(new BouncyCastleProvider());
+
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519", "BC");
+        KeyPair keyPair = kpg.generateKeyPair();
+
+        PublicKey publicKey = keyPair.getPublic();
+        String encodedPublicKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        user.addProperty(new UserPropertyImpl(encodedPublicKey));
+        Security.removeProvider("BC");
         return keyPair;
     }
 
