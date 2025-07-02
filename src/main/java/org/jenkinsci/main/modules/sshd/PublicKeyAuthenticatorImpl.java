@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
-import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
 import java.security.PublicKey;
@@ -25,10 +24,8 @@ import java.util.logging.Logger;
  */
 class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
 
-    private final PublicKeySignatureWriter signatureWriter = new PublicKeySignatureWriter();
-
     public boolean authenticate(String username, PublicKey key, ServerSession session) {
-        User user = this.retrieveOnlyKeyValidatedUser(username, key);
+        User user = this.retrieveOnlyKeyValidatedUser(username, key, session);
 
         if (user == null) {
             SecurityListener.fireFailedToAuthenticate(username);
@@ -45,7 +42,7 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
         return true;
     }
 
-    private @CheckForNull User retrieveOnlyKeyValidatedUser(String username, PublicKey key) {
+    private @CheckForNull User retrieveOnlyKeyValidatedUser(String username, PublicKey key, ServerSession session) {
         LOGGER.log(Level.FINE, "Authentication attempted from {0} with {1}", new Object[]{ username, key });
         User u = User.getById(username, false);
         if (u == null) {
@@ -59,14 +56,14 @@ class PublicKeyAuthenticatorImpl implements PublickeyAuthenticator {
             return null;
         }
 
-        String signature = signatureWriter.asString(key);
-        if (!sshKey.isAuthorizedKey(signature)) {
-            LOGGER.log(Level.FINE,"Key signature did not match for the user: {0} : {1}", new Object[]{ username, signature });
+        if (!sshKey.has(key)) {
+            LOGGER.log(Level.FINE,"Key signature did not match for the user: {0} : {1}", new Object[]{ username, key });
             return null;
         }
 
         return u;
     }
+
 
     private @CheckForNull UserDetails verifyUserUsingSecurityRealm(@NonNull User user) {
         try {

@@ -60,8 +60,8 @@
       <artifactId>mina-sshd-api-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>eddsa-api</artifactId>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>bouncycastle-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.modules</groupId>

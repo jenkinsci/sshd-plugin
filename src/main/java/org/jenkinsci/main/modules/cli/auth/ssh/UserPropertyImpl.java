@@ -12,7 +12,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.sshd.common.config.keys.PublicKeyEntry;
+import org.apache.sshd.server.auth.pubkey.KeySetPublickeyAuthenticator;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -21,7 +25,6 @@ import org.kohsuke.stapler.QueryParameter;
  * @author Kohsuke Kawaguchi
  */
 public class UserPropertyImpl extends UserProperty {
-    private static final PublicKeySignatureWriter signature = new PublicKeySignatureWriter();
     public String authorizedKeys;
 
     @DataBoundConstructor
@@ -33,22 +36,37 @@ public class UserPropertyImpl extends UserProperty {
      * Checks if this user has the given public key in his {@link #authorizedKeys}.
      */
     public boolean has(PublicKey pk) {
-        return isAuthorizedKey(signature.asString(pk));
+
+        KeySetPublickeyAuthenticator keySetPublickeyAuthenticator =
+                new KeySetPublickeyAuthenticator(getClass().getName(), getPublicKeys(this.authorizedKeys));
+        return keySetPublickeyAuthenticator.authenticate(null, pk, null);
     }
 
     public boolean isAuthorizedKey(String sig) {
-        try {
-            final BufferedReader r = new BufferedReader(new StringReader(authorizedKeys));
-            String s;
-            while ((s=r.readLine())!=null) {
-                String[] tokens = s.split("\\s+");
-                if (tokens.length>=2 && tokens[1].equals(sig))
-                    return true;
-            }
-            return false;
-        } catch (IOException e) {// impossible
+        // we should have only one but the API is not documented on what is supported,
+        // so we suppose many
+        List<PublicKey> keys = getPublicKeys(sig);
+        if (keys.isEmpty()) {
             return false;
         }
+        for (PublicKey key : keys) {
+            boolean authz = has(key);
+            if (authz) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<PublicKey> getPublicKeys(String keys) {
+        return
+                Arrays.stream(keys.split("\n")).map(s -> {
+                    try {
+                        return PublicKeyEntry.parsePublicKeyEntry(s).resolvePublicKey(null, null, null);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
     }
 
     @Extension
@@ -73,19 +91,13 @@ public class UserPropertyImpl extends UserProperty {
             final BufferedReader r = new BufferedReader(new StringReader(value));
             String s;
             while ((s = r.readLine()) != null) {
-                String[] tokens = s.split("\\s+");
-                if (tokens.length < 2) {
-                    if (s.trim().isEmpty()) {
-                        continue;
-                    } else {
-                        return FormValidation.warning("Unexpected line: ‘" + s + "’");
-                    }
+                if(s.isEmpty()){
+                    continue;
                 }
-                if (!tokens[0].matches("ssh-[a-z]+")) {
-                    return FormValidation.warning("‘" + tokens[0] + "’ does not look like a valid key type");
-                }
-                if (!tokens[1].matches("[a-zA-Z0-9/+]+=*")) {
-                    return FormValidation.error("‘" + tokens[1] + "’ does not look like a Base64-encoded public key");
+                try {
+                    getPublicKeys(s);
+                } catch (Exception ex) {
+                    return FormValidation.warning(ex.getMessage());
                 }
             }
             return FormValidation.ok();
@@ -94,10 +106,9 @@ public class UserPropertyImpl extends UserProperty {
     }
 
     public static User findUser(PublicKey identity) {
-        String sig = signature.asString(identity);
         for (User u : User.getAll()) {
             UserPropertyImpl p = u.getProperty(UserPropertyImpl.class);
-            if (p!=null && p.isAuthorizedKey(sig))
+            if (p!=null && p.has(identity))
                 return u;
         }
         return null;
