@@ -23,7 +23,6 @@ import jenkins.util.SystemProperties;
 import jenkins.util.Timer;
 import net.jcip.annotations.GuardedBy;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
@@ -175,11 +174,11 @@ public class SSHD extends GlobalConfiguration {
     }
 
     private List<NamedFactory<Mac>> filterMacs(List<NamedFactory<Mac>> macFactories) {
-        if (StringUtils.isBlank(EXCLUDED_MACS)) {
+        if (EXCLUDED_MACS.isBlank()) {
             return macFactories;
         }
 
-        List<String> excludedNames = Arrays.stream(EXCLUDED_MACS.split(",")).filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+        List<String> excludedNames = Arrays.stream(EXCLUDED_MACS.split(",")).filter(s -> !s.isBlank()).map(String::trim).collect(Collectors.toList());
 
         List<NamedFactory<Mac>> filtered = new ArrayList<>();
         for (NamedFactory<Mac> macFactory : macFactories) {
@@ -200,11 +199,11 @@ public class SSHD extends GlobalConfiguration {
      * @return a filtered list of key exchange factories
      */
     private List<KeyExchangeFactory> filterKeyExchanges(List<KeyExchangeFactory> keyExchangeFactories) {
-        if (StringUtils.isBlank(EXCLUDED_KEY_EXCHANGES)) {
+        if (EXCLUDED_KEY_EXCHANGES.isBlank()) {
             return keyExchangeFactories;
         }
 
-        List<String> excludedNames = Arrays.stream(EXCLUDED_KEY_EXCHANGES.split(",")).filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+        List<String> excludedNames = Arrays.stream(EXCLUDED_KEY_EXCHANGES.split(",")).filter(s -> !s.isBlank()).map(String::trim).collect(Collectors.toList());
 
         List<KeyExchangeFactory> filtered = new ArrayList<>();
         for (KeyExchangeFactory keyExchangeNamedFactory : keyExchangeFactories) {
