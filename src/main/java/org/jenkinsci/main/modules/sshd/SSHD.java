@@ -199,7 +199,7 @@ public class SSHD extends GlobalConfiguration {
      * @return a filtered list of key exchange factories
      */
     private List<KeyExchangeFactory> filterKeyExchanges(List<KeyExchangeFactory> keyExchangeFactories) {
-        if (EXCLUDED_KEY_EXCHANGES.isBlank()) {
+        if (EXCLUDED_KEY_EXCHANGES == null || EXCLUDED_KEY_EXCHANGES.isBlank()) {
             return keyExchangeFactories;
         }
 
