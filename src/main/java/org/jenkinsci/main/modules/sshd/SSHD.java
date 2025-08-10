@@ -174,7 +174,7 @@ public class SSHD extends GlobalConfiguration {
     }
 
     private List<NamedFactory<Mac>> filterMacs(List<NamedFactory<Mac>> macFactories) {
-        if (EXCLUDED_MACS.isBlank()) {
+        if (EXCLUDED_MACS == null || EXCLUDED_MACS.isBlank()) {
             return macFactories;
         }
 
